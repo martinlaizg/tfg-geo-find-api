@@ -3,34 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\User;
-use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
-use Log;
+use Illuminate\Http\Request;
 
-class UserController extends Controller {
+class UserController extends Controller
+{
 
-	public function getAll()
+    public function getAll()
     {
         return response()->json(User::all());
     }
 
     public function get($id)
     {
-		
+
         return response()->json(User::find($id));
     }
 
     public function create(Request $request)
     {
-		try{
-			
-			$user = User::create($request->all());
-			return response()->json($user, 201);
+        try {
 
-		} catch(QueryException $e){
-			return response()->json(['error' => 1, 'message'=>__FUNCTION__."() in ".__FILE__." at ".__LINE__]);
-		}
-	}
+            $user = User::create($request->all());
+            return response()->json($user, 201);
+
+        } catch (QueryException $e) {
+            return response()->json(['error' => 1, 'message' => __FUNCTION__ . "() in " . __FILE__ . " at " . __LINE__]);
+        }
+    }
 
     public function update($id, Request $request)
     {

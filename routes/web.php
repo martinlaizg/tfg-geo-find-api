@@ -19,7 +19,7 @@
 $router->group(['prefix' => 'api'], function () use ($router) {
 	$router->get(	'',				['uses' => 'HomeController@home']);
 
-	$router->get(	'users',		['uses' => 'UserController@showAllusers']);
+	$router->get(	'users',		['uses' => 'UserController@getAll']);
 	$router->post(	'users',		['uses' => 'UserController@create']);
 	$router->get(	'users/{id}',	['uses' => 'UserController@showOneUser']);
 	$router->delete('users/{id}',	['uses' => 'UserController@delete']);
