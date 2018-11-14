@@ -1,0 +1,179 @@
+#%RAML 1.0
+title: GeoFind API
+version: v1
+baseUri: https://localhost:8000/api
+mediaType:  application/json
+types:
+  User:
+    properties:
+      name:
+        type: string
+        example: "Martin Laiz Gomez"
+      username:
+        type: string
+        example: "martinlaizg"
+      email:
+        type: string
+        example: "martinlaizg@gmail.com"
+      password:
+        type: string
+        example: "MyPassWOrd123"
+      bdate?:
+        type: date-only
+        example: "1999-01-23"
+  Location:
+    properties:
+      lat:
+        type: string
+      lon:
+        type: string
+  Map:
+    properties:
+      locations:
+        type: array
+        items: Location
+      minLevel:
+        type: string
+
+
+/users:
+  description: Usuarios de la aplicacion
+  get:
+    description: Obtener todos los usuarios
+    responses:
+      200:
+        description: No hay error
+        body:
+          application/json:
+            type: User[]
+  post:
+    description: Crea un usuario
+    body:
+      type: User
+    responses:
+      201:
+        description: Se ha creado el usuario correctamente
+        body:
+          application/json:
+            type: User[]
+  /{id}:
+    get:
+      description: Obtener un usuarios
+      responses:
+        200:
+          description: El usuario existe
+          body:
+            application/json:
+              type: User
+    put:
+      description: Modifica un usuario
+      body:
+        type: User
+      responses:
+        201:
+          description: Se ha creado el usuario correctamente
+          body:
+            application/json:
+              type: User
+    delete:
+      description: Elimina un usuario
+      responses:
+        200:
+          description: Todo ha ido bien
+/maps:
+  description: Mapas de juego
+  get:
+    description: Obtiene todos los mapas
+    responses:
+      200:
+        description: Se obtienen todos los mapas
+        body:
+          application/json:
+            type: array
+            items: Map
+  post:
+    description: Crea un mapa
+    responses:
+      200:
+        description: Todo ha ido ok
+        body:
+          application/json:
+            type: Map
+  /{id}:
+    get:
+      description: Obtiene un mapa
+      responses:
+        200:
+          description: Todo ha ido ok
+          body:
+            application/json:
+              type: Map
+    put:
+      description: Modifica un mapa
+      responses:
+        200:
+          description: Todo ha ido ok
+          body:
+            application/json:
+              type: Map
+    delete:
+      description: Borra un mapa
+      responses:
+        200:
+          description: Todo ha ido ok
+/locations:
+  description: Localizaciones de los mapas
+  get:
+    description: Obtiene todas las localizaciones
+    responses:
+      200:
+        description: Todo ha ido bien
+        body:
+          application/json:
+            type: array
+            items: Location
+  post:
+    description: Crea una localización
+    body:
+      application/json:
+        type: Location
+    responses:
+      200:
+        description: Todo ha ido bien
+        body:
+          application/json:
+            type: Location
+  /{id}:
+    get:
+      description: Obtiene una localización
+      responses:
+        200:
+          description: Todo ha ido bien
+          body:
+            application/json:
+              type: Location
+    put:
+      description: Modifica una localización
+      body:
+        application/json:
+          type: Location
+      responses:
+        200:
+          description: Todo ha ido bien
+          body:
+            application/json:
+              type: Location
+    delete:
+      description: Borra una localización
+      responses:
+        200:
+          description: Todo ha ido bien
+/search:
+  description: Búsqueda de mapas y localizaciones
+  get:
+    description: Realiza una búsqueda de mapas
+    queryParameters:
+      q?:
+        description: Campo de búsqueda (opcional)
+        type: string
+        example: "Valencia"

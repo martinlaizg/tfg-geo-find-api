@@ -9,20 +9,44 @@
 | It is a breeze. Simply tell Lumen the URIs it should respond to
 | and give it the Closure to call when that URI is requested.
 |
-|	$router->get('URI', ['uses' => 'Controller@method'])
-|	$router->post
-|	$router->put
-|	$router->delete
+|   $router->get('URI', ['uses' => 'Controller@method'])
+|   $router->post
+|   $router->put
+|   $router->delete
 |
-*/
+ */
 
 $router->group(['prefix' => 'api'], function () use ($router) {
-	$router->get(	'',				['uses' => 'HomeController@home']);
+    $router->get('', ['uses' => 'HomeController@home']);
 
-	$router->get(	'users',		['uses' => 'UserController@getAll']);
-	$router->post(	'users',		['uses' => 'UserController@create']);
-	$router->get(	'users/{id}',	['uses' => 'UserController@showOneUser']);
-	$router->delete('users/{id}',	['uses' => 'UserController@delete']);
-	$router->put(	'users/{id}',	['uses' => 'UserController@update']);
+	// User endpoints
+    $router->group(['prefix' => 'user'], function () use ($router) {
+        $router->get('', 			['uses' => 'UserController@getAll']);
+        $router->post('', 			['uses' => 'UserController@create']);
+        $router->get('/{id}', 		['uses' => 'UserController@get']);
+        $router->put('/{id}', 		['uses' => 'UserController@update']);
+        $router->delete('/{id}', 	['uses' => 'UserController@delete']);
+	});
 
-  });
+	// Map endpoints
+    $router->group(['prefix' => 'maps'], function () use ($router) {
+        $router->get('', 			['uses' => 'MapController@getAll']);
+        $router->post('', 			['uses' => 'MapController@create']);
+        $router->get('/{id}', 		['uses' => 'MapController@get']);
+        $router->put('/{id}', 		['uses' => 'MapController@update']);
+        $router->delete('/{id}', 	['uses' => 'MapController@delete']);
+	});
+
+	// Location endpoints
+    $router->group(['prefix' => 'locations'], function () use ($router) {
+        $router->get('', 			['uses' => 'LocationController@getAll']);
+        $router->post('', 			['uses' => 'LocationController@create']);
+        $router->get('/{id}', 		['uses' => 'LocationController@get']);
+        $router->put('/{id}', 		['uses' => 'LocationController@update']);
+        $router->delete('/{id}', 	['uses' => 'LocationController@delete']);
+	});
+
+	// Search endpoints
+    $router->get('/search', ['uses' => 'SearchController@search']);
+
+});
