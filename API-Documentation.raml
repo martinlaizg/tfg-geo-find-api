@@ -114,12 +114,59 @@ types:
           body:
             application/json:
               type: Map
-
     delete:
       description: Borra un mapa
       responses:
         200:
           description: Todo ha ido ok
+/locations:
+  description: Localizaciones de los mapas
+  get:
+    description: Obtiene todas las localizaciones
+    responses:
+      200:
+        description: Todo ha ido bien
+        body:
+          application/json:
+            type: array
+            items: Location
+  post:
+    description: Crea una localización
+    body:
+      application/json:
+        type: Location
+    responses:
+      200:
+        description: Todo ha ido bien
+        body:
+          application/json:
+            type: Location
+  /{id}:
+    description: Una única localización en concreto
+    get:
+      description: Obtiene una localización
+      responses:
+        200:
+          description: Todo ha ido bien
+          body:
+            application/json:
+              type: Location
+    put:
+      description: Modifica una localización
+      body:
+        application/json:
+          type: Location
+      responses:
+        200:
+          description: Todo ha ido bien
+          body:
+            application/json:
+              type: Location
+    delete:
+      description: Borra una localización
+      responses:
+        200:
+          description: Todo ha ido bien
 /search:
   description: Búsqueda de mapas y localizaciones
   get:
