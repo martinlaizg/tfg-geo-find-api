@@ -1,7 +1,7 @@
 #%RAML 1.0
 title: GeoFind API
 version: v1
-baseUri: https://example.com/api
+baseUri: https://localhost:8000/api
 mediaType:  application/json
 types:
   User:
@@ -21,6 +21,18 @@ types:
       bdate?:
         type: date-only
         example: "1999-01-23"
+  Location:
+    properties:
+      coords:
+        type: string
+  Map:
+    properties:
+      locations:
+        type: array
+        items: Location
+      minLevel:
+        type: string
+
 
 /users:
   description: Usuarios de la aplicacion
@@ -29,11 +41,9 @@ types:
     responses:
       200:
         description: No hay error
-        body: 
+        body:
           application/json:
-            example: |
-              {"message":" ok"}
-              
+            type: User[]
   post:
     description: Crea un usuario
     body:
@@ -41,12 +51,18 @@ types:
     responses:
       201:
         description: Se ha creado el usuario correctamente
-        body: 
+        body:
           application/json:
-            example: |
-              {"message":" ok"}
-              
+            type: User[]
   /{id}:
+    get:
+      description: Obtener un usuarios
+      responses:
+        200:
+          description: El usuario existe
+          body:
+            application/json:
+              type: User
     put:
       description: Modifica un usuario
       body:
@@ -54,6 +70,63 @@ types:
       responses:
         201:
           description: Se ha creado el usuario correctamente
-          body: 
+          body:
             application/json:
               type: User
+    delete:
+      description: Elimina un usuario
+      responses:
+        200:
+          description: Todo ha ido bien
+/maps:
+  description: Mapas de juego
+  get:
+    description: Obtiene todos los mapas
+    responses:
+      200:
+        description: Se obtienen todos los mapas
+        body:
+          application/json:
+            type: array
+            items: Map
+  post:
+    description: Crea un mapa
+    responses:
+      200:
+        description: Todo ha ido ok
+        body:
+          application/json:
+            type: Map
+  /{id}:
+    description: Mapa único
+    get:
+      description: Obtiene un mapa
+      responses:
+        200:
+          description: Todo ha ido ok
+          body:
+            application/json:
+              type: Map
+    put:
+      description: Modifica un mapa
+      responses:
+        200:
+          description: Todo ha ido ok
+          body:
+            application/json:
+              type: Map
+
+    delete:
+      description: Borra un mapa
+      responses:
+        200:
+          description: Todo ha ido ok
+/search:
+  description: Búsqueda de mapas y localizaciones
+  get:
+    description: Realiza una búsqueda de mapas
+    queryParameters:
+      q?:
+        description: Campo de búsqueda (opcional)
+        type: string
+        example: "Valencia"
