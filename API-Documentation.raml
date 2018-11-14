@@ -23,7 +23,9 @@ types:
         example: "1999-01-23"
   Location:
     properties:
-      coords:
+      lat:
+        type: string
+      lon:
         type: string
   Map:
     properties:
@@ -142,7 +144,6 @@ types:
           application/json:
             type: Location
   /{id}:
-    description: Una única localización en concreto
     get:
       description: Obtiene una localización
       responses:
