@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class UsersTableSeeder extends Seeder
+class LocationsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,6 +13,6 @@ class UsersTableSeeder extends Seeder
     {
         $faker = Faker\Factory::create('es_ES');
 
-		$users = factory(App\User::class, 20)->create();
+		$location = factory(App\Location::class, 200)->create();
     }
 }

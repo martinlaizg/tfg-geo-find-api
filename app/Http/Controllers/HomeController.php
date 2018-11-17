@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use Illuminate\Http\Request;
+class HomeController extends Controller
+{
 
-class HomeController extends Controller {
-
-	public function home()
+    public function home()
     {
-        return response()->json(['message'=>'Bienvenido a la API de GeoFind']);
+        return response()->json(['message' => 'Bienvenido a la API de GeoFind']);
+    }
+
+    public function routeNotFound()
+    {
+		return response()->json([
+			'message' => 'Ruta no disponible'
+		]);
     }
 
 }
