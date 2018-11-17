@@ -13,6 +13,6 @@ class MapsTableSeeder extends Seeder
     {
         $faker = Faker\Factory::create('es_ES');
 
-		$map = factory(App\Map::class, 20)->create();
+		$map = factory(App\Map::class, 10)->create();
     }
 }

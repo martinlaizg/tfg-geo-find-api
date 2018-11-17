@@ -13,6 +13,6 @@ class LocationsTableSeeder extends Seeder
     {
         $faker = Faker\Factory::create('es_ES');
 
-		$location = factory(App\Location::class, 200)->create();
+		$location = factory(App\Location::class, 10)->create();
     }
 }

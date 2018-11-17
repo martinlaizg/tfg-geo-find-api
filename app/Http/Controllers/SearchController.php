@@ -14,10 +14,10 @@ class SearchController extends Controller
 
     public function search(Request $request)
     {
-		$maps = Map::all();
-		$locations = Location::all();
-
-		return response()->json(['maps'=>$maps, 'locations'=>$locations]);
+		$maps = Map::get();
+		$locations = Location::get();
+		$search = $maps->concat($locations);
+		return response($search);//->json($merge);
     }
 
 }
