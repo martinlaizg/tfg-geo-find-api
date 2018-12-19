@@ -1,5 +1,8 @@
 <?php
 
+use App\User;
+use Illuminate\Support\Facades\Hash;
+
 /*
 |--------------------------------------------------------------------------
 | Model Factories
@@ -16,7 +19,7 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'name' => $faker->name,
         'email' => $faker->email,
         'username' => $faker->unique()->userName,
-        'password' => $faker->password,
+        'password' => Hash::make($faker->password),
         'bdate' => $faker->date($format = 'Y-m-d', $max = 'now'),
         'user_type' => $faker->randomElement($array = ['admin', 'creator', 'user'])
     ];
@@ -27,7 +30,8 @@ $factory->define(App\Map::class, function (Faker\Generator $faker) {
         'name' => $faker->address,
         'country' => $faker->country,
         'state' => $faker->state,
-        'city' => $faker->city,
+		'city' => $faker->city,
+		'user_id' => User::inRandomOrder()->first()->id,
         'min_level' => $faker->randomElement($array = ['therm', 'compass', 'any'])
     ];
 });

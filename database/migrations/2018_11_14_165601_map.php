@@ -19,8 +19,11 @@ class Map extends Migration
 			$table->string('country');
 			$table->string('state');
 			$table->string('city');
+			$table->unsignedInteger('user_id');
 			$table->enum('min_level',['therm','compass','any']);
 			$table->timestamps();
+
+			$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

@@ -11,8 +11,17 @@ class MapsTableSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker\Factory::create('es_ES');
+		// $faker = Faker\Factory::create('es_ES');
 
-		$map = factory(App\Map::class, 10)->create();
+		DB::table('maps')->insert([
+			'name' => 'Playas',
+			'country' => 'España',
+			'state' => 'Alicante/Alacant',
+			'city' => 'Benidorm',
+			'user_id' => 1,
+			'min_level'=>'any',
+		]);
+
+		// $map = factory(App\Map::class, 10)->create();
     }
 }
