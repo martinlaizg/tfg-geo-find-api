@@ -29,7 +29,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
 	];
-	
+
 	/**
      * The attributes that should be mutated to dates.
      *
@@ -39,5 +39,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'created_at',
         'updated_at',
         'bdate'
-    ];
+	];
+
+	public function createdMaps(){
+        return $this->hasMany('App\Map','creator_id');
+	}
 }

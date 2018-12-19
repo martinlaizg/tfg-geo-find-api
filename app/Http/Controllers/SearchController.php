@@ -12,12 +12,24 @@ use Illuminate\Http\Request;
 class SearchController extends Controller
 {
 
+	function __construct(){
+	}
+
     public function search(Request $request)
     {
-		$maps = Map::get();
-		$locations = Location::get();
-		$search = $maps->concat($locations);
-		return response($search);//->json($merge);
+		$log = new Logger(__CLASS__);
+
+		$query = $request->input('q');
+		$log->debug('search item = '.$query);
+		if($query != ""){
+			$maps = Map::where('name', 'like', '%'.$query.'%')->with('creator')->get();
+			$locations = Location::where('name', 'like', '%'.$query.'%')->get();
+		} else {
+			$maps = Map::with('creator')->get();
+			$locations = Location::get();
+		}
+		$merge = $maps->concat($locations);
+		return response()->json($maps);
     }
 
 }

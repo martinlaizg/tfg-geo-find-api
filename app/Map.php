@@ -36,5 +36,13 @@ class Map extends Model
     protected $dates = [
         'created_at',
         'updated_at'
-    ];
+	];
+
+	/**
+	 * Get the creator of the Map
+	 */
+	public function creator(){
+		return $this->belongsTo('App\User');
+	}
+
 }

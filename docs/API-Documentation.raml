@@ -6,18 +6,18 @@ mediaType:  application/json
 types:
   User:
     properties:
-      name:
-        type: string
-        example: "Martin Laiz Gomez"
-      username:
-        type: string
-        example: "martinlaizg"
       email:
         type: string
         example: "martinlaizg@gmail.com"
       password:
         type: string
         example: "MyPassWOrd123"
+      username?:
+        type: string
+        example: "martinlaizg"
+      name?:
+        type: string
+        example: "Martin Laiz Gomez"
       bdate?:
         type: date-only
         example: "1999-01-23"
@@ -177,3 +177,29 @@ types:
         description: Campo de búsqueda (opcional)
         type: string
         example: "Valencia"
+/login:
+  description: Inicio de sesión de un usuario
+  post:
+    description: Un usuario realiza el inicio de sesión
+    body:
+      application/json:
+        type: User
+    responses:
+      200:
+        description: Todo ha ido bien
+        body:
+          application/json:
+            type: User
+/register:
+  description: Inicio de sesión de un usuario
+  post:
+    description: Un usuario realiza el inicio de sesión
+    body:
+      application/json:
+        type: User
+    responses:
+      200:
+        description: Todo ha ido bien
+        body:
+          application/json:
+            type: User

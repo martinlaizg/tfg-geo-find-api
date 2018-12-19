@@ -31,7 +31,7 @@ $factory->define(App\Map::class, function (Faker\Generator $faker) {
         'country' => $faker->country,
         'state' => $faker->state,
 		'city' => $faker->city,
-		'user_id' => User::inRandomOrder()->first()->id,
+		'creator_id' => User::inRandomOrder()->first()->id,
         'min_level' => $faker->randomElement($array = ['therm', 'compass', 'any'])
     ];
 });
