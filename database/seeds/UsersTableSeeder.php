@@ -24,7 +24,7 @@ class UsersTableSeeder extends Seeder
 			'name' => 'Martin',
 			'email' => 'martinlaizg@gmail.com',
 			'username' => 'martinlaizg',
-			'password' => Hash::make('martinlaizg'),
+			'password' => 'martinlaizg',
 			'bdate' => $faker->date($format = 'Y-m-d', $max = 'now'),
 			'user_type' => 'admin',
 			'created_at' => $date,

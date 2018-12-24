@@ -19,7 +19,7 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'name' => $faker->name,
         'email' => $faker->email,
         'username' => $faker->unique()->userName,
-        'password' => Hash::make($faker->password),
+        'password' => $faker->password,
         'bdate' => $faker->date($format = 'Y-m-d', $max = 'now'),
         'user_type' => $faker->randomElement($array = ['admin', 'creator', 'user'])
     ];

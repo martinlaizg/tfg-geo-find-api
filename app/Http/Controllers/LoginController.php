@@ -6,6 +6,7 @@ use App\User;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Monolog\Logger;
 
 class LoginController extends Controller
@@ -17,12 +18,15 @@ class LoginController extends Controller
             $log = new Logger("LoginController");
             $email = $request->input('email');
             $password = $request->input('password');
-            $user = User::where('email', $email)->firstOrFail();
-            // $cryptedPassword = bcrypt($password);
-            $cryptedPassword = $password;
-            if ($user->password != $cryptedPassword) {
-                throw new Exception("Incorrect user or password");
-            }
+
+            $encryptedPassword = Hash::make($password);
+            $log->info("Login: (email='" . $email . "', password='" . $password . ", encryptedPassword='" . $encryptedPassword . "')");
+
+            $user = User::where([
+                ['email', $email],
+                ['password', $encryptedPassword],
+            ])->firstOrFail();
+            $log->info("User: " . $user);
             return response()->json($user);
         } catch (Exception $e) {
             return response()->json(['error' => 1, 'message' => 'Email or password incorrecto']);
