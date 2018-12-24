@@ -19,14 +19,16 @@ class LoginController extends Controller
             $email = $request->input('email');
             $password = $request->input('password');
 
-            $encryptedPassword = Hash::make($password);
-            $log->info("Login: (email='" . $email . "', password='" . $password . ", encryptedPassword='" . $encryptedPassword . "')");
+            // $encryptedPassword = Hash::make($password);
+            // $log->info("Login: (email='" . $email . "', password='" . $password . ", encryptedPassword='" . $encryptedPassword . "')");
+			$log->debug("Login: (email='" . $email . "', password='" . $password . ")");
 
             $user = User::where([
                 ['email', $email],
-                ['password', $encryptedPassword],
+                ['password', $password],
+                // ['password', $encryptedPassword],
             ])->firstOrFail();
-            $log->info("User: " . $user);
+            $log->debug("User: " . $user);
             return response()->json($user);
         } catch (Exception $e) {
             return response()->json(['error' => 1, 'message' => 'Email or password incorrecto']);
