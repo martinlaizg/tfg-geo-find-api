@@ -8,6 +8,7 @@
 
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('', ['uses' => 'HomeController@home']);
+    $router->get('dashboard', ['uses' => 'HomeController@dashboard']);
 
     // User endpoints
     $router->group(['prefix' => 'users'], function () use ($router) {

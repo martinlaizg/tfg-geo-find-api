@@ -41,7 +41,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'bdate'
 	];
 
+	/**
+	 * Get the user created maps
+	 */
 	public function createdMaps(){
+		// Second paramater because Eloquent search 'createdMaps_id' on maps database
         return $this->hasMany('App\Map','creator_id');
 	}
+
+
 }

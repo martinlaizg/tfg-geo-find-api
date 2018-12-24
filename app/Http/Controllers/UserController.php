@@ -11,7 +11,7 @@ class UserController extends Controller
 
     public function getAll()
     {
-        return response()->json(User::all());
+        return response()->json(User::get());
     }
 
     public function get($id)
