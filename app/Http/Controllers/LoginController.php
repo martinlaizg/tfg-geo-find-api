@@ -22,7 +22,7 @@ class LoginController extends Controller
             // $encryptedPassword = Hash::make($password);
             // $log->info("Login: (email='" . $email . "', password='" . $password . ", encryptedPassword='" . $encryptedPassword . "')");
 			$log->debug("Login: (email='" . $email . "', password='" . $password . ")");
-
+			$log->debug('Request: '. $request);
             $user = User::where([
                 ['email', $email],
                 ['password', $password],
