@@ -31,7 +31,7 @@ class LoginController extends Controller
             $log->debug("User: " . $user);
             return response()->json($user);
         } catch (Exception $e) {
-            return response()->json(['error' => 1, 'message' => 'Email or password incorrecto']);
+            return response()->json(['error' => 1, 'message' => 'Email or password incorrecto'], 404);
         }
     }
 
@@ -42,7 +42,7 @@ class LoginController extends Controller
             return response()->json($user, 201);
 
         } catch (QueryException $e) {
-            return response()->json(['error' => 1, 'message' => __FUNCTION__ . "() in " . __FILE__ . " at " . __LINE__]);
+            return response()->json(['error' => 1, 'message' => "Registro incorrecto"], 404);
         }
     }
 
