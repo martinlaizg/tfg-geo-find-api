@@ -177,13 +177,26 @@ types:
         description: Campo de búsqueda (opcional)
         type: string
         example: "Valencia"
+    responses:
+      200:
+        description: Búsqueda correcta
+        body:
+          application/json:
+            type: array
+            items: Map
 /login:
   description: Inicio de sesión de un usuario
   post:
     description: Un usuario realiza el inicio de sesión
     body:
       application/json:
-        type: User
+        properties:
+          email:
+            type: string
+            example: myemail@email.com
+          password:
+            type: string
+            example: MyPaSWORD1234
     responses:
       200:
         description: Todo ha ido bien
