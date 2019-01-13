@@ -3,12 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Map;
+use App\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Monolog\Logger;
 
 class MapController extends Controller
 {
+
+    public function getCoordWithMargin($userCoord)
+    {
+        $margin = 100;
+        return [$userCoord - $margin, $userCoord + $margin];
+    }
 
     public function getAll(Request $request)
     {
@@ -19,9 +26,8 @@ class MapController extends Controller
             $log->debug('coords=' . $coords);
             $userLat = strtok($coords, ',');
             $userLon = strtok(',');
-            $margin = 100;
-            $lat = [$userLat - $margin, $userLat + $margin];
-            $lon = [$userLon - $margin, $userLon + $margin];
+            $lat = $this->getCoordWithMargin($userLat);
+            $lon = $this->getCoordWithMargin($userLon);
             $log->debug('lat=' . $userLat . '; range=(' . implode(',', $lat) . ')');
             $log->debug('lon=' . $userLon . '; range=(' . implode(',', $lon) . ')');
 
@@ -31,8 +37,32 @@ class MapController extends Controller
         }
         $creator = $request->input('creator');
         if ($creator != "") {
+            $creator_id = User::where('username', 'like', '%' . $creator)
+                ->orWhere('username', 'like', $creator . '%')
+                ->orWhere('username', 'like', '%' . $creator . '%')
+                ->orWhere('name', 'like', $creator . '%')
+                ->orWhere('name', 'like', '%' . $creator)
+                ->orWhere('name', 'like', '%' . $creator . '%')->first()->id;
             $log->debug('creator=' . $creator);
-            $maps = $maps->where('creator_id', $creator);
+            $log->debug('creator_id=' . $creator_id);
+            $maps = $maps->where('creator_id', $creator_id);
+        }
+        $search = $request->input('q');
+        if ($search != "") {
+            $log->debug('search=' . $search);
+            $maps = $maps
+                ->where('name', 'like', '%' . $search)
+                ->orWhere('name', 'like', $search . '%')
+                ->orWhere('name', 'like', '%' . $search . '%')
+                ->orWhere('country', 'like', $search . '%')
+                ->orWhere('country', 'like', '%' . $search)
+                ->orWhere('country', 'like', '%' . $search . '%')
+                ->orWhere('state', 'like', $search . '%')
+                ->orWhere('state', 'like', '%' . $search)
+                ->orWhere('state', 'like', '%' . $search . '%')
+                ->orWhere('city', 'like', $search . '%')
+                ->orWhere('city', 'like', '%' . $search)
+                ->orWhere('city', 'like', '%' . $search . '%');
         }
 
         return response()->json($maps->with('creator')->get(), 200);
