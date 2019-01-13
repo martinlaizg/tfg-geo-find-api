@@ -2,11 +2,7 @@
 
 namespace App;
 
-use Illuminate\Auth\Authenticatable;
-use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class Map extends Model
 {
@@ -16,7 +12,7 @@ class Map extends Model
      * @var array
      */
     protected $fillable = [
-		'name', 'country', 'state', 'city', 'min_level',
+        'name', 'country', 'state', 'city', 'min_level',
     ];
 
     /**
@@ -26,23 +22,29 @@ class Map extends Model
      */
     protected $hidden = [
         // 'password',
-	];
+    ];
 
-	/**
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
      */
     protected $dates = [
         'created_at',
-        'updated_at'
-	];
+        'updated_at',
+    ];
 
-	/**
-	 * Get the creator of the Map
-	 */
-	public function creator(){
-		return $this->belongsTo('App\User');
-	}
+    /**
+     * Get the creator of the Map
+     */
+    public function creator()
+    {
+        return $this->belongsTo('App\User');
+    }
+
+    public function locations()
+    {
+        return $this->hasMany('App\Location');
+    }
 
 }

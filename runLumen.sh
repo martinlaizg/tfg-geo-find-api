@@ -1,3 +1,3 @@
 #!/bin/sh
 clear
-php -S localhost:8000 -t public
+php -S 192.168.1.182:8000 -t public

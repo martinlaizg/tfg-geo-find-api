@@ -2,11 +2,7 @@
 
 namespace App;
 
-use Illuminate\Auth\Authenticatable;
-use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class Location extends Model
 {
@@ -16,7 +12,7 @@ class Location extends Model
      * @var array
      */
     protected $fillable = [
-		'lat', 'lon'
+        'lat', 'lon',
     ];
 
     /**
@@ -26,15 +22,20 @@ class Location extends Model
      */
     protected $hidden = [
         // 'password',
-	];
+    ];
 
-	/**
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
      */
     protected $dates = [
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
+
+    public function map()
+    {
+        return $this->belongsTo('App\Map');
+    }
 }

@@ -1,7 +1,7 @@
 <?php
 
+use App\Map;
 use App\User;
-use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +21,7 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'username' => $faker->unique()->userName,
         'password' => $faker->password,
         'bdate' => $faker->date($format = 'Y-m-d', $max = 'now'),
-        'user_type' => $faker->randomElement($array = ['admin', 'creator', 'user'])
+        'user_type' => $faker->randomElement($array = ['admin', 'creator', 'user']),
     ];
 });
 
@@ -30,17 +30,17 @@ $factory->define(App\Map::class, function (Faker\Generator $faker) {
         'name' => $faker->address,
         'country' => $faker->country,
         'state' => $faker->state,
-		'city' => $faker->city,
-		'creator_id' => User::inRandomOrder()->first()->id,
-        'min_level' => $faker->randomElement($array = ['therm', 'compass', 'any'])
+        'city' => $faker->city,
+        'creator_id' => User::inRandomOrder()->first()->id,
+        'min_level' => $faker->randomElement($array = ['therm', 'compass', 'any']),
     ];
 });
 
 $factory->define(App\Location::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->address,
+        'map_id' => Map::inRandomOrder()->first()->id,
         'lat' => $faker->latitude($min = -90, $max = 90),
-        'lon' => $faker->longitude($min = -180, $max = 180)
+        'lon' => $faker->longitude($min = -180, $max = 180),
     ];
 });
-

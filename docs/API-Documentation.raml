@@ -83,7 +83,16 @@ types:
 /maps:
   description: Mapas de juego
   get:
-    description: Obtiene todos los mapas
+    description: Obtiene mapas según los parametros
+    queryParameters:
+      coords?:
+        description: Coordenadas del usuario
+        type: String
+        example: "12.323914,133.96344"
+      user?:
+        description: Usuario para filtrar mapas
+        type: integer
+        example: 2
     responses:
       200:
         description: Se obtienen todos los mapas
