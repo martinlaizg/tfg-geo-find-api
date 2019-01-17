@@ -38,11 +38,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     });
 
     // Search endpoints
-	$router->get('search', ['uses' => 'SearchController@search']);
+    $router->get('search', ['uses' => 'SearchController@search']);
 
-	// Login
-	$router->post('login', ['uses' => 'LoginController@login']);
+    // Login
+    $router->post('login', ['uses' => 'LoginController@login']);
 
-	// Register
-	$router->post('register', ['uses' => 'LoginController@register']);
+    // Register
+    $router->post('register', ['uses' => 'LoginController@register']);
 });
