@@ -30,9 +30,9 @@ class UsersTableSeeder extends Seeder
             'updated_at' => $date,
         ]);
 
-        $users = factory(App\User::class, 20)->create()->each(function ($user) {
-            $user->createdMaps()->save(factory(App\Map::class)->make());
-            $user->createdMaps()->save(factory(App\Map::class)->make());
-        });
+        // $users = factory(App\User::class, 20)->create()->each(function ($user) {
+        //     $user->createdMaps()->save(factory(App\Map::class)->make());
+        //     $user->createdMaps()->save(factory(App\Map::class)->make());
+        // });
     }
 }

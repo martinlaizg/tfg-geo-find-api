@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
 			UsersTableSeeder::class,
-			LocationsTableSeeder::class,
 			MapsTableSeeder::class,
+			LocationsTableSeeder::class,
         ]);
 
         Model::reguard();

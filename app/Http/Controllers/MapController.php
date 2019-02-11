@@ -75,7 +75,8 @@ class MapController extends Controller
     {
         $log = new Logger('MapController - Get by id');
         $log->debug('map_id=' . $id);
-        return response()->json(Map::find($id));
+        $map = Map::find($id)->with('creator')->with('locations')->first();
+        return response()->json($map);
     }
 
     public function create(Request $request)
