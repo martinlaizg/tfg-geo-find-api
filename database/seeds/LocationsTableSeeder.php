@@ -20,9 +20,9 @@ class LocationsTableSeeder extends Seeder
             for ($i = 1; $i < $numLocations; $i++) {
                 $location = new Location;
                 $location->name = "Localización " . $cont;
-                $location->lat = rand(3800000, 390000) / 10000;
-                $location->lon = rand(-100000, 10000) / 10000;
-                $location->image = 'http://lorempixel.com/300/200/city/' . $numLocations;
+                $location->lat = rand(38000, 39000) / 1000;
+                $location->lon = rand(-1000, 1000) / 1000;
+                $location->image = 'http://lorempixel.com/300/200/city/' . rand(1, 10);
                 $map->locations()->save($location);
                 $cont++;
             }
