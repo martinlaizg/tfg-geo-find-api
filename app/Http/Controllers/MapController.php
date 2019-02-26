@@ -105,4 +105,16 @@ class MapController extends Controller
         return response('Deleted Successfully', 200);
     }
 
+    public function getLocations($id)
+    {
+        $log = new Logger('MapController - Get Locations');
+        $log->debug('map_id=' . $id);
+        try {
+            $locations = Map::find($id)->locations;
+        } catch (\Exception $e) {
+            return response()->json(['error' => 2, 'message' => $e->getMessage()]);
+        }
+        return response()->json($locations);
+    }
+
 }

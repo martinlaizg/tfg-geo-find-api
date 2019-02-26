@@ -26,6 +26,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('{id}', ['uses' => 'MapController@get']);
         $router->put('{id}', ['uses' => 'MapController@update']);
         $router->delete('{id}', ['uses' => 'MapController@delete']);
+        $router->get('{id}/locations', ['uses' => 'MapController@getLocations']);
     });
 
     // Location endpoints
