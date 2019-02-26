@@ -16,7 +16,7 @@ class Map extends Migration
         Schema::create('maps', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('description');
+            $table->string('description')->default('Sin descripcion');
             $table->string('country');
             $table->string('state');
             $table->string('city');

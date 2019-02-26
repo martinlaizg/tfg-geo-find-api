@@ -20,7 +20,7 @@ class MapsTableSeeder extends Seeder
         for ($i = 1; $i <= 10; $i++) {
             $map = new Map;
             $map->name = "Mapa " . $i;
-            $map->name = "Descripción " . $i;
+            $map->description = "Descripción " . $i;
             $map->country = "País " . $i;
             $map->state = "Provincia " . $i;
             $map->city = "Ciudad " . $i;
