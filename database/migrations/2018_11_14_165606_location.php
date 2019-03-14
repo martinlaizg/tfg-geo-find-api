@@ -19,7 +19,7 @@ class Location extends Migration
             $table->string('name');
             $table->string('lat');
             $table->string('lon');
-            $table->string('image');
+            $table->string('image')->default("");
             $table->timestamps();
 
             $table->foreign('map_id')->references('id')->on('maps')->onDelete('cascade');
