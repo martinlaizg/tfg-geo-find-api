@@ -31,6 +31,6 @@ class MapsTableSeeder extends Seeder
         $map->city = "Alicante/Alacant";
         $map->image = "http://lorempixel.com/400/200/city/";
         $map->min_level = "compass";
-        $user->maps()->save($map);
+        $user->createdMaps()->save($map);
     }
 }
