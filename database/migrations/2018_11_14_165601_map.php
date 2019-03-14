@@ -22,7 +22,7 @@ class Map extends Migration
             $table->string('city');
             $table->string('image');
             $table->unsignedInteger('creator_id');
-            $table->enum('min_level', ['therm', 'compass', 'any']);
+            $table->enum('min_level', ['therm', 'compass', 'map']);
             $table->timestamps();
 
             $table->foreign('creator_id')->references('id')->on('users')->onDelete('cascade');
