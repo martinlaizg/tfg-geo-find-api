@@ -16,135 +16,31 @@ class LocationsTableSeeder extends Seeder
         $map = Map::first();
 
         $loc = new Location;
-        $loc->lat = 38.343534;
-        $loc->lon = -0.485350;
-        $loc->name = "WP N.- 1 INICIO - Plaza de Gabriel Miró ( Correos )";
+        $loc->name = "Dibujar el espacio";
+        $loc->description = "Esta gigantesca mano sita en el campus de la Universidad de Alicante, ubicado en el municipio de San Vicente del Raspeig, es una escultura de Pepe Díaz Azorín que expresa un homenaje a la Universidad de Orihuela (1569-1824), recordando los esfuerzos y anhelos de maestros y escolares de otros siglos. Titulada Diuxar l'espai, presidiendo una de las principales entradas del campus, tiene más de 7 m de altura y está realizada con 52 toneladas de homigón blanco. Fue donada a la universidad en 1998 y se ha convertido en su símbolo. Pudo ser restaurada en 2011 gracias a la Fundación Manuel Peláez.";
+        $loc->lat = 38.385500;
+        $loc->lon = -0.511155;
         $map->locations()->save($loc);
 
         $loc = new Location;
-        $loc->lat = 38.344503;
-        $loc->lon = -0.478957;
-        $loc->name = "WP N.- 2 Playa del Postiguet, Puerta del Mar  1,1 Km";
+        $loc->name = "Reloj de sol";
+        $loc->description = "La idea del reloj solar que aquí se presenta nació como propuesta de dotar a la Escuela Politécnica de un elemento simbólico que sirviera como punto de referencia de los edificios que forman esta Escuela dentro del campus de la Universidad de Alicante. La gran cantidad de días despejados de que disponemos en Alicante permiten asegurar el funcionamiento natural de éste. El diseño de este elemento se aparta un poco de la forma convencional de estos instrumentos, y surgió como respuesta al problema de ejecutar materialmente la graduación de las marcas horarias sobre la superficie o cuadra~te sobre la que se proyecta la sombra del estilo, de manera que se pensó en una superficie que con su propia forma produjera dicha graduación. Como consecuencia, la sombra solar sube un escalón cada hora por la mañana, hasta que a partir de mediodía comienza a bajar uno cada hora de la tarde por el otro lado.Este escalonamiento se pensó y sirve de hecho normalmente como asiento para los estudiantes y también el reloj de sol se usa";
+        $loc->lat = 38.386237;
+        $loc->lon = -0.511448;
         $map->locations()->save($loc);
 
         $loc = new Location;
-        $loc->lat = 38.348833;
-        $loc->lon = -0.472058;
-        $loc->name = "WP N.- 3 Playa del Postiguet, La Marina  2 Km.";
+        $loc->name = "Biblioteca universitaria";
+        $loc->description = "La Biblioteca general, dispone de aulas de ordenadores, amplio lugar para estudiar y leer, así como una definida oferta de lectura académica y otra literatura";
+        $loc->lat = 38.383650;
+        $loc->lon = -0.512115;
         $map->locations()->save($loc);
 
         $loc = new Location;
-        $loc->lat = 38.351056;
-        $loc->lon = -0.468942;
-        $loc->name = "WP N.- 4 Playa del Cocó, R. C. de Regatas 2,4 Km";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.355405;
-        $loc->lon = -0.460875;
-        $loc->name = "WP N.- 5 Final Paseo Bajo, Subida a la  Loma 3,5 Km.";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.359689;
-        $loc->lon = -0.453267;
-        $loc->name = "WP N.- 6 Intersección Ruta Corta,  3,5 Km Bajada a Orillamar";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.362436;
-        $loc->lon = -0.447621;
-        $loc->name = "WP N.- 7 La Isteta,  Albufereta ( TRAM ) 5,2 Km.";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.365109;
-        $loc->lon = -0.449698;
-        $loc->name = "WP N.- 8 Subida Sant Juliá ( 6,6 Km y 35 m.)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.362040;
-        $loc->lon = -0.450525;
-        $loc->name = "WP N.- 8 bis Barrera ( 6,1 Km y 73 m)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.363369;
-        $loc->lon = -0.450554;
-        $loc->name = "WP N.- 9 Caminos y Senderos 6,5 Km y 124 m.";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.364114;
-        $loc->lon = -0.450967;
-        $loc->name = "WP N.- 10 Asentamiento Neolítico ( 6,7 Km y 116 m)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.362529;
-        $loc->lon = -0.452951;
-        $loc->name = "WP N.- 11 Intersección Izq.  ( 7,1 Km y 160 m.)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.361783;
-        $loc->lon = -0.453000;
-        $loc->name = "WP N.- 12 Mirador de Levante ( 7, 2 Km y 165 m.)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.360999;
-        $loc->lon = -0.457203;
-        $loc->name = "WP N.- 13 Collado Jesuitas ( 7, 8 Km y 170 m.)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.358099;
-        $loc->lon = -0.459692;
-        $loc->name = "WP N. 14 Mirador de los Fuegos  ( 8,2 Km y 177 m.)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.357101;
-        $loc->lon = -0.462163;
-        $loc->name = "WP N.- 15 Mirador de Poniente ( 8,5 KIm y 164 m)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.357222;
-        $loc->lon = -0.464719;
-        $loc->name = "WP N.- 16 Abajo ( 8,9 Km y 73 m.)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.353906;
-        $loc->lon = -0.470316;
-        $loc->name = "WP N.- 17 La Sangueta. TRAM ( 9,6 Km y 42 m )";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.348653;
-        $loc->lon = -0.474772;
-        $loc->name = "WP N.- 18 Virgen del Socorro ( 10 ,5 Km y 17 m)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.346603;
-        $loc->lon = -0.478318;
-        $loc->name = "WP N.- 19 San Roque ( 11 Km y 27 m)";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.346086;
-        $loc->lon = -0.478980;
-        $loc->name = "WP N.- 20 Paseito Ramiro ( 11,3 Km )";
-        $map->locations()->save($loc);
-
-        $loc = new Location;
-        $loc->lat = 38.343712;
-        $loc->lon = -0.484616;
-        $loc->name = "WP N.-  21 FINAL,  Plaza de Correos ( 12 Km.)";
+        $loc->name = "Obra de Arte, Escultura de Antoni Miró";
+        $loc->description = "El alcoyano Antoni Miró donará a la Universidad de Alicante una escultura en conmemoración de La Batalla de Almansa del 25 de abril de 1707 que enfrentó a los ejércitos borbónicos de Felipe V y los austracistas del archiduque Carlos de Austria. Con unas dimensiones de 2,90 x 10 x 1,20 metros y un peso de 4 toneladas y media. Dicha escultura se ha instalado en la fuente situada junto al edificio de Filosofía y Letras III del campus de San Vicente, y lleva por título Almansa 1707. La donación de esta escultura va acompañada del cuadro Les Nigerianes, y de una colección de 80 grabados digitales que formarán parte del fondo del MUA. Inspirada en la obra que el pintor Ricardo Balaca pintó en 1862, Antoni Miró ha querido mostrar en la escultura la retirada de tropas, con soldados llevando a los heridos y muertos, que convirtió la campaña en una carnicería y que supuso el inicio de la pérdida de Valencia de su condición de reino.";
+        $loc->lat = 38.384571;
+        $loc->lon = -0.514871;
         $map->locations()->save($loc);
 
     }
