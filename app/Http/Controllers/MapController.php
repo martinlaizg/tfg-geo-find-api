@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Map;
 use App\User;
+use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Monolog\Logger;
@@ -13,7 +14,7 @@ class MapController extends Controller
 
     public function getCoordWithMargin($userCoord)
     {
-        $margin = 100;
+        $margin = 10;
         return [$userCoord - $margin, $userCoord + $margin];
     }
 
@@ -37,15 +38,25 @@ class MapController extends Controller
             }
             $creator = $request->input('creator');
             if ($creator != '') {
-                $creator_id = User::where('username', 'like', '%' . $creator)
-                    ->orWhere('username', 'like', $creator . '%')
-                    ->orWhere('username', 'like', '%' . $creator . '%')
-                    ->orWhere('name', 'like', $creator . '%')
-                    ->orWhere('name', 'like', '%' . $creator)
-                    ->orWhere('name', 'like', '%' . $creator . '%')->first()->id;
-                $log->debug('creator=' . $creator);
+                $creator_id = (int) $creator;
                 $log->debug('creator_id=' . $creator_id);
-                $maps = $maps->where('creator_id', $creator_id);
+                if ($creator_id == 0) {
+                    try {
+                        $creator_id = User::where('username', 'like', '%' . $creator)
+                            ->orWhere('username', 'like', $creator . '%')
+                            ->orWhere('username', 'like', '%' . $creator . '%')
+                            ->orWhere('name', 'like', $creator . '%')
+                            ->orWhere('name', 'like', '%' . $creator)
+                            ->orWhere('name', 'like', '%' . $creator . '%')->first()->id;
+                        $log->debug('new_creator_id=' . $creator_id);
+                    } catch (Exception $e) {
+                        $log->debug('exception catched');
+                        $creator_id = 0;
+                    }
+                }
+                if ($creator_id > 0) {
+                    $maps = $maps->where('creator_id', $creator_id);
+                }
             }
             $search = $request->input('q');
             if ($search != '') {
