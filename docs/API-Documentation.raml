@@ -3,38 +3,7 @@ title: GeoFind API
 version: v1
 baseUri: https://localhost:8000/api
 mediaType:  application/json
-types:
-  User:
-    properties:
-      email:
-        type: string
-        example: "martinlaizg@gmail.com"
-      password:
-        type: string
-        example: "MyPassWOrd123"
-      username?:
-        type: string
-        example: "martinlaizg"
-      name?:
-        type: string
-        example: "Martin Laiz Gomez"
-      bdate?:
-        type: date-only
-        example: "1999-01-23"
-  Location:
-    properties:
-      lat:
-        type: string
-      lon:
-        type: string
-  Map:
-    properties:
-      locations:
-        type: array
-        items: Location
-      minLevel:
-        type: string
-
+types: !include schemas/types.raml
 
 /users:
   description: Usuarios de la aplicacion
@@ -45,7 +14,7 @@ types:
         description: No hay error
         body:
           application/json:
-            type: User[]
+
   post:
     description: Crea un usuario
     body:
@@ -55,7 +24,8 @@ types:
         description: Se ha creado el usuario correctamente
         body:
           application/json:
-            type: User[]
+            type: User
+
   /{id}:
     get:
       description: Obtener un usuarios
