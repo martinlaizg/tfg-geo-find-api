@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Monolog\Logger;
 
 class UserController extends Controller
 {
@@ -16,19 +17,34 @@ class UserController extends Controller
 
     public function get($id)
     {
-		return response()->json(User::find($id));
+        return response()->json(User::find($id));
     }
 
     public function create(Request $request)
     {
+        $log = new Logger('UserController - create');
+
+        $this->validate($request, [
+            'email' => 'required|email|unique:users',
+            'username' => 'required|unique:users',
+            'name' => 'required',
+            'password' => 'required',
+            'user_type' => 'required',
+        ]);
+
+        $u = new User;
         try {
-
-            $user = User::create($request->all());
-            return response()->json($user, 201);
-
+            $u->email = $request->input('email');
+            $u->name = $request->input('name');
+            $u->username = $request->input('username');
+            $u->password = $request->input('password');
+            $u->user_type = $request->input('user_type');
+            $u->save();
         } catch (QueryException $e) {
-            return response()->json(['error' => 1, 'message' => __FUNCTION__ . "() in " . __FILE__ . " at " . __LINE__]);
+            $log->debug(__FUNCTION__ . "() in " . __FILE__ . " at " . __LINE__ . " // " . $e->getMessage());
+            return response()->json(['error' => 1, 'message' => 'QueryException']);
         }
+        return response()->json($u);
     }
 
     public function update($id, Request $request)

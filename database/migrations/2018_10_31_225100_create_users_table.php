@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('username')->unique();
             $table->string('password');
             $table->string('name');
-            $table->string('image');
+            $table->string('image')->default("");
             $table->date('bdate')->nullable();
             $table->enum('user_type', ['admin', 'creator', 'user']);
             $table->timestamps();
