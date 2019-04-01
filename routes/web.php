@@ -44,6 +44,4 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // Login
     $router->post('login', ['uses' => 'LoginController@login']);
 
-    // Register
-    $router->post('register', ['uses' => 'LoginController@register']);
 });

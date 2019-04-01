@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Monolog\Logger;
+use Validator;
 
 class UserController extends Controller
 {
@@ -23,14 +24,21 @@ class UserController extends Controller
     public function create(Request $request)
     {
         $log = new Logger('UserController - create');
-
-        $this->validate($request, [
+        $log->debug('createUser');
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users',
             'username' => 'required|unique:users',
             'name' => 'required',
             'password' => 'required',
             'user_type' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'type' => $validator->errors()->keys()[0],
+                'message' => $validator->errors()->first(),
+            ], 401);
+        }
 
         $u = new User;
         try {
@@ -39,6 +47,7 @@ class UserController extends Controller
             $u->username = $request->input('username');
             $u->password = $request->input('password');
             $u->user_type = $request->input('user_type');
+            $log->debug($u);
             $u->save();
         } catch (QueryException $e) {
             $log->debug(__FUNCTION__ . "() in " . __FILE__ . " at " . __LINE__ . " // " . $e->getMessage());
