@@ -17,10 +17,7 @@ class Map extends Migration
             $table->increments('id');
             $table->string('name');
             $table->text('description');
-            $table->string('country');
-            $table->string('state');
-            $table->string('city');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->unsignedInteger('creator_id');
             $table->enum('min_level', ['therm', 'compass', 'map']);
             $table->timestamps();

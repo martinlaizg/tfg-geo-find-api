@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Monolog\Logger;
+use Validator;
 
 class MapController extends Controller
 {
@@ -86,27 +87,70 @@ class MapController extends Controller
     {
         $log = new Logger('MapController - Get by id');
         $log->debug('map_id=' . $id);
-        $map = Map::find($id)->with('creator')->with('locations')->first();
+        // $map = Map::find($id)->with('creator')->with('locations')->first();
+        $map = Map::find($id);
         return response()->json($map);
     }
 
     public function create(Request $request)
     {
-        try {
-
-            $map = Map::create($request->all());
-            return response()->json($map, 201);
-
-        } catch (QueryException $e) {
-            return response()->json(['error' => 1, 'message' => $e->getMessage()]);
+        $log = new Logger('MapController - Create Map');
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'description' => 'required',
+            'min_level' => 'required',
+            'creator_id' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'type' => $validator->errors()->keys()[0],
+                    'message' => $validator->errors()->first(),
+                ], 401);
+            }
         }
+        $map = new Map;
+        $map->name = $request->input('name');
+        $map->description = $request->input('description');
+        $map->min_level = $request->input('min_level');
+        $map->image = $request->input('image') != null ? $request->input('image') : "";
+        $creator = User::find($request->input('creator_id'));
+        $creator->createdMaps()->save($map);
+        $log->debug($map);
+        return response()->json($map);
     }
 
     public function update($id, Request $request)
     {
-        $map = Map::findOrFail($id);
-        $map->update($request->all());
+        $log = new Logger('MapController - Create Map');
 
+        if (count(Map::where('id', $id)->get()) == 0) {
+            return response()->json([
+                'type' => 'id',
+                'message' => 'The map no exist',
+            ], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'description' => 'required',
+            'min_level' => 'required',
+        ]);
+        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'type' => $validator->errors()->keys()[0],
+                    'message' => $validator->errors()->first(),
+                ], 401);
+            }
+        }
+
+        $map = Map::find($id);
+        $map->name = $request->input('name');
+        $map->description = $request->input('description');
+        $map->min_level = $request->input('min_level');
+        $map->save();
+        $log->debug('new map = ' . $map);
         return response()->json($map, 200);
     }
 

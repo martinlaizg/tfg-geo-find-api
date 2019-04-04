@@ -23,8 +23,7 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
-        $log = new Logger('UserController - create');
-        $log->debug('createUser');
+        $log = new Logger('UserController - createUser');
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users',
             'username' => 'required|unique:users',
