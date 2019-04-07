@@ -18,7 +18,14 @@ class UserController extends Controller
 
     public function get($id)
     {
-        return response()->json(User::find($id));
+        $user = User::find($id);
+        if ($user == null) {
+            return response()->json([
+                'type' => 'id',
+                'message' => 'El id no existe',
+            ], 404);
+        }
+        return response()->json($user, 200);
     }
 
     public function create(Request $request)
@@ -50,7 +57,7 @@ class UserController extends Controller
             $u->save();
         } catch (QueryException $e) {
             $log->debug(__FUNCTION__ . "() in " . __FILE__ . " at " . __LINE__ . " // " . $e->getMessage());
-            return response()->json(['error' => 1, 'message' => 'QueryException']);
+            return response()->json(['error' => 1, 'message' => 'QueryException'], 500);
         }
         return response()->json($u);
     }

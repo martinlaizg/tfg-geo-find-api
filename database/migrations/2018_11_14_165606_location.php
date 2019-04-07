@@ -18,6 +18,7 @@ class Location extends Migration
             $table->unsignedInteger('map_id');
             $table->string('name');
             $table->text('description');
+            $table->integer('position');
             $table->string('lat');
             $table->string('lon');
             $table->string('image')->default("");
