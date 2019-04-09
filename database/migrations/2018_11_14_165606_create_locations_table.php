@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class Location extends Migration
+class CreateLocationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -18,12 +18,13 @@ class Location extends Migration
             $table->unsignedInteger('map_id');
             $table->string('name');
             $table->text('description');
-            $table->integer('position');
+            $table->integer('position')->nullable();
             $table->string('lat');
             $table->string('lon');
             $table->string('image')->default("");
             $table->timestamps();
 
+            $table->unique(['map_id', 'position']);
             $table->foreign('map_id')->references('id')->on('maps')->onDelete('cascade');
 
         });

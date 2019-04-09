@@ -10,12 +10,6 @@ use Validator;
 
 class UserController extends Controller
 {
-
-    public function getAll()
-    {
-        return response()->json(User::get());
-    }
-
     public function get($id)
     {
         $user = User::find($id);

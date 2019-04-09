@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Location;
 use App\Map;
 use App\User;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Monolog\Logger;
 use Validator;
 
@@ -76,7 +78,9 @@ class MapController extends Controller
                     ->orWhere('city', 'like', '%' . $search)
                     ->orWhere('city', 'like', '%' . $search . '%');
             }
-            return response()->json($maps->with('creator')->get(), 200);
+            return response()->json($maps->with(['creator', 'locations' => function ($query) {
+                $query->orderBy('position');
+            }])->get(), 200);
 
         } catch (QueryException $e) {
             return response()->json(['error' => 1, 'message' => $e->getMessage()]);
@@ -122,13 +126,13 @@ class MapController extends Controller
 
     public function update($id, Request $request)
     {
-        $log = new Logger('MapController - Create Map');
-
+        $log = new Logger(__CLASS__ . __METHOD__);
+        $log->debug($request);
         if (count(Map::where('id', $id)->get()) == 0) {
             return response()->json([
                 'type' => 'id',
                 'message' => 'The map no exist',
-            ], 401);
+            ], 404);
         }
 
         $validator = Validator::make($request->all(), [
@@ -162,14 +166,114 @@ class MapController extends Controller
 
     public function getLocations($id)
     {
-        $log = new Logger('MapController - Get Locations');
-        $log->debug('map_id=' . $id);
-        try {
-            $locations = Map::find($id)->locations;
-        } catch (\Exception $e) {
-            return response()->json(['error' => 2, 'message' => $e->getMessage()]);
+        $log = new Logger(__CLASS__ . __METHOD__);
+        $log->debug('map_id:' . $id);
+        $map = Map::find($id);
+        if ($map == null) {
+            return response()->json([
+                'type' => 'id',
+                'message' => 'The map_id not exist',
+            ], 404);
         }
-        return response()->json($locations);
+
+        $locs = $map->locations()->orderBy('position')->get();
+        return response()->json($locs);
+    }
+
+    public function createLocations($id, Request $request)
+    {
+        $log = new Logger(__CLASS__ . __METHOD__);
+        $log->debug('map_id:' . $id);
+
+        $map = Map::find($id);
+        if ($map == null) {
+            return response()->json([
+                'type' => 'id',
+                'message' => 'The map no exist',
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            '*.name' => 'required|string',
+            '*.description' => 'required|string',
+            '*.lat' => 'required|numeric',
+            '*.lon' => 'required|numeric',
+            '*.position' => 'required|integer|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'type' => $validator->errors()->keys()[0],
+                    'message' => $validator->errors()->first(),
+                ], 401);
+            }
+        }
+
+        DB::transaction(function () use ($map, $request, $log) {
+            foreach ($request->json() as $row) {
+                $loc = new Location;
+                $loc->name = $row['name'];
+                $loc->description = $row['description'];
+                $loc->lat = $row['lat'];
+                $loc->lon = $row['lon'];
+                $loc->position = $row['position'];
+                $map->locations()->save($loc);
+            }
+        });
+
+        return response()->json($map->locations);
+    }
+
+    public function updateLocations($id, Request $request)
+    {
+        $log = new Logger(__CLASS__ . __METHOD__);
+        $log->debug('map_id:' . $id);
+        $log->debug($request);
+
+        $map = Map::find($id);
+        if ($map == null) {
+            return response()->json([
+                'type' => 'id',
+                'message' => 'The map no exist',
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            '*.id' => 'required|integer',
+            '*.name' => 'required|string',
+            '*.description' => 'required|string',
+            '*.lat' => 'required|numeric',
+            '*.lon' => 'required|numeric',
+            '*.position' => 'required|integer|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'type' => $validator->errors()->keys()[0],
+                    'message' => $validator->errors()->first(),
+                ], 401);
+            }
+        }
+
+        $map->locations()->update(['position' => null]);
+
+        DB::transaction(function () use ($map, $request, $log) {
+            foreach ($request->json() as $row) {
+                $id = $row['id'];
+                $loc = $map->locations()->find($id);
+                $loc->name = $row['name'];
+                $loc->description = $row['description'];
+                $loc->lat = $row['lat'];
+                $loc->lon = $row['lon'];
+                $loc->position = $row['position'];
+                $loc->save();
+            }
+        });
+
+        return response()->json($map->locations);
+
     }
 
 }
