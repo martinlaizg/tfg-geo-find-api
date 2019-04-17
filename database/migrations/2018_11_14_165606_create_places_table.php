@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLocationsTable extends Migration
+class CreatePlacesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,19 @@ class CreateLocationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('locations', function (Blueprint $table) {
+        Schema::create('places', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('map_id');
+            $table->unsignedInteger('tour_id');
             $table->string('name');
             $table->text('description');
-            $table->integer('position')->nullable();
-            $table->string('lat');
-            $table->string('lon');
+            $table->integer('order')->nullable();
+            $table->double('lat', 12, 8);
+            $table->double('lon', 12, 8);
             $table->string('image')->default("");
             $table->timestamps();
 
-            $table->unique(['map_id', 'position']);
-            $table->foreign('map_id')->references('id')->on('maps')->onDelete('cascade');
+            $table->unique(['tour_id', 'order']);
+            $table->foreign('tour_id')->references('id')->on('tours')->onDelete('cascade');
 
         });
     }
@@ -37,6 +37,6 @@ class CreateLocationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('locations');
+        Schema::dropIfExists('places');
     }
 }

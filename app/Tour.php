@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Map extends Model
+class Tour extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -13,15 +13,6 @@ class Map extends Model
      */
     protected $fillable = [
         'name', 'country', 'state', 'city', 'min_level',
-    ];
-
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        // 'password',
     ];
 
     /**
@@ -42,9 +33,9 @@ class Map extends Model
         return $this->belongsTo('App\User');
     }
 
-    public function locations()
+    public function places()
     {
-        return $this->hasMany('App\Location');
+        return $this->hasMany('App\Place')->orderBy('order');
     }
 
 }

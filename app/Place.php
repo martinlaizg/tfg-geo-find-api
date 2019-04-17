@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Location extends Model
+class Place extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -13,15 +13,6 @@ class Location extends Model
      */
     protected $fillable = [
         'lat', 'lon',
-    ];
-
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        // 'password',
     ];
 
     /**
@@ -34,8 +25,8 @@ class Location extends Model
         'updated_at',
     ];
 
-    public function map()
+    public function tour()
     {
-        return $this->belongsTo('App\Map');
+        return $this->belongsTo('App\Tour');
     }
 }

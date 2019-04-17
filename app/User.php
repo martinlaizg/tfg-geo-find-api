@@ -3,10 +3,10 @@
 namespace App;
 
 use Illuminate\Auth\Authenticatable;
-use Laravel\Lumen\Auth\Authorizable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Lumen\Auth\Authorizable;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
@@ -18,7 +18,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-		'email', 'username', 'password', 'name', 'bdate', 'user_type',
+        'email', 'username', 'password', 'name', 'bdate', 'user_type',
     ];
 
     /**
@@ -28,9 +28,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     protected $hidden = [
         'password',
-	];
+    ];
 
-	/**
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -38,16 +38,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $dates = [
         'created_at',
         'updated_at',
-        'bdate'
-	];
+        'bdate',
+    ];
 
-	/**
-	 * Get the user created maps
-	 */
-	public function createdMaps(){
-		// Second paramater because Eloquent search 'createdMaps_id' on maps database
-        return $this->hasMany('App\Map','creator_id');
-	}
-
+    /**
+     * Get the user created maps
+     */
+    public function createdTours()
+    {
+        // Second paramater because Eloquent search 'createdTours_id' on maps database
+        return $this->hasMany('App\Tour', 'creator_id');
+    }
 
 }
