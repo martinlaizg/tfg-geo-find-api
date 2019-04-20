@@ -18,7 +18,7 @@ class CreatePlacesTable extends Migration
             $table->unsignedInteger('tour_id');
             $table->string('name');
             $table->text('description');
-            $table->integer('order')->nullable();
+            $table->integer('order');
             $table->double('lat', 12, 8);
             $table->double('lon', 12, 8);
             $table->string('image')->default("");

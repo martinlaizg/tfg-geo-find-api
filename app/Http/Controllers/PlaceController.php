@@ -2,12 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Location;
+use App\Tour;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
-class LocationController extends Controller
+class PlaceController extends Controller
 {
+
+    public function getByTour($id)
+    {
+        $tour = Tour::find($id);
+        return response()->json($tour->places);
+    }
+
+    public function getPlaceByTour($id, $place_id)
+    {
+        $place = Tour::find($id)->places()->where('id', $place_id)->first();
+        if ($place == null) {
+            return response()->json([
+                'type' => 'id',
+                'message' => 'The palce no exist on tour',
+            ], 404);
+        }
+        return response()->json($place);
+    }
 
     public function getAll()
     {

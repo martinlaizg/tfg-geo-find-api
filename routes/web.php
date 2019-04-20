@@ -25,16 +25,16 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // $router->put('maps', ['uses' => 'TourController@create']);
     // $router->delete('maps', ['uses' => 'TourController@create']);
 
-    // $router->get('maps/{id}', ['uses' => 'TourController@get']);
+    $router->get('maps/{id}', ['uses' => 'TourController@getSingleTour']);
     $router->put('maps/{id}', ['uses' => 'TourController@update']);
     // $router->delete('maps/{id}', ['uses' => 'TourController@delete']);
 
-    $router->get('maps/{id}/locations', ['uses' => 'TourController@getLocations']);
+    $router->get('maps/{id}/locations', ['uses' => 'PlaceController@getByTour']);
     // $router->post('maps/{id}/locations', ['uses' => 'TourController@createLocations']);
     $router->put('maps/{id}/locations', ['uses' => 'TourController@updateLocations']);
     // $router->delete('maps/{id}/locations', ['uses' => 'TourController@getLocations']);
 
-    // $router->get('maps/{id}/locations/{locId}', ['uses' => 'TourController@getLocations']);
+    $router->get('maps/{id}/locations/{place_id}', ['uses' => 'PlaceController@getPlaceByTour']);
     // $router->put('maps/{id}/locations/{locId}', ['uses' => 'TourController@getLocations']);
     // $router->delete('maps/{id}/locations/{locId}', ['uses' => 'TourController@getLocations']);
 
