@@ -27,7 +27,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password',
+        'password', 'pivot',
     ];
 
     /**
@@ -42,12 +42,17 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     ];
 
     /**
-     * Get the user created maps
+     * Get the user created tours
      */
     public function createdTours()
     {
-        // Second paramater because Eloquent search 'createdTours_id' on maps database
+        // Second paramater because Eloquent search 'createdTours_id' on tours table
         return $this->hasMany('App\Tour', 'creator_id');
+    }
+
+    public function tours()
+    {
+        return $this->belongsToMany('App\Tour', 'plays', 'user_id', 'tour_id')->withTimestamps();
     }
 
 }

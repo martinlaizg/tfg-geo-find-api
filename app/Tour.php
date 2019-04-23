@@ -6,28 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tour extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'name', 'country', 'state', 'city', 'min_level',
     ];
 
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
+    protected $hidden = [
+        'pivot',
+    ];
+
     protected $dates = [
         'created_at',
         'updated_at',
     ];
 
-    /**
-     * Get the creator of the Map
-     */
     public function creator()
     {
         return $this->belongsTo('App\User');
@@ -36,6 +27,11 @@ class Tour extends Model
     public function places()
     {
         return $this->hasMany('App\Place')->orderBy('order');
+    }
+
+    public function players()
+    {
+        return $this->belongsToMany('App\User', 'plays', 'tour_id', 'user_id')->withTimestamps();
     }
 
 }

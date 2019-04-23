@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UsersTableSeeder::class,
             ToursTableSeeder::class,
             PlacesTableSeeder::class,
+            PlaysTableSeeder::class,
         ]);
 
         Model::reguard();

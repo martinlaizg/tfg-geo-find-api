@@ -6,20 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Place extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'lat', 'lon',
     ];
 
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
+    protected $hidden = [
+        'pivot',
+    ];
+
     protected $dates = [
         'created_at',
         'updated_at',
@@ -28,5 +22,10 @@ class Place extends Model
     public function tour()
     {
         return $this->belongsTo('App\Tour');
+    }
+
+    public function plays()
+    {
+        return $this->belongsToMany('App\Play')->withTimestamps();
     }
 }

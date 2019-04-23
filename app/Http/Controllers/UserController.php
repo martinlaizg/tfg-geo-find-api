@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Play;
 use App\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -10,6 +11,32 @@ use Validator;
 
 class UserController extends Controller
 {
+
+    public function getPlay($user_id, $tour_id)
+    {
+        $userPlay = Play::where('user_id', $user_id)
+            ->where('tour_id', $tour_id)
+            ->with(['tour', 'user', 'places'])
+            ->first();
+        return response()->json($userPlay);
+    }
+
+    public function createPlay($user_id, $tour_id)
+    {
+        $play = Play::where('user_id', $user_id)
+            ->where('tour_id', $tour_id)
+            ->first();
+        if ($play != null) {
+            return response()->json([
+                'type' => 'exist',
+                'message' => 'The play already exist',
+            ], 404);
+        }
+        $user = User::find($user_id);
+        $user->tours()->attach($tour_id);
+        return $this->getPlay($user_id, $tour_id);
+    }
+
     public function get($id)
     {
         $user = User::find($id);
