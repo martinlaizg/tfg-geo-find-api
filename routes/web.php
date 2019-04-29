@@ -9,7 +9,7 @@
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('', ['uses' => 'HomeController@home']);
     $router->get('dashboard', ['uses' => 'HomeController@dashboard']);
-    $router->post('login', ['uses' => 'LoginController@login']);
+    $router->post('login', ['uses' => 'UserController@login']);
 
     // $router->get('users', ['uses' => 'UserController@getAll']);
     $router->post('users', ['uses' => 'UserController@create']);

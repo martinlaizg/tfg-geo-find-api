@@ -12,6 +12,32 @@ use Validator;
 class UserController extends Controller
 {
 
+    public function login(Request $request)
+    {
+        try {
+            $log = new Logger(__METHOD__);
+
+            $email = $request->input('email');
+            $password = $request->input('password');
+
+            $log->info("Login email=" . $email);
+            $log->debug("Login password=" . $password);
+            $user = User::where([
+                ['email', $email],
+                ['password', $password],
+            ])->firstOrFail();
+            $log->debug("User: " . $user);
+
+            return response()->json($user);
+        } catch (Exception $e) {
+            $log->debug("Invalid user or password");
+            return response()->json([
+                'type' => 'exist',
+                'message' => 'Invalid user or password']
+                , 404);
+        }
+    }
+
     public function getPlay($user_id, $tour_id)
     {
         $userPlay = Play::where('user_id', $user_id)
