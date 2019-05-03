@@ -19,6 +19,7 @@ class CreatePlacePlayTable extends Migration
             $table->unsignedInteger('place_id');
             $table->timestamps();
 
+            $table->unique(['play_id', 'place_id']);
             $table->foreign('play_id')->references('id')->on('plays')->onDelete('cascade');
             $table->foreign('place_id')->references('id')->on('places')->onDelete('cascade');
 

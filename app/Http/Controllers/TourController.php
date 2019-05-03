@@ -17,6 +17,12 @@ use Validator;
 class TourController extends Controller
 {
 
+	public function getPlaces($id)
+    {
+        $tour = Tour::find($id);
+        return response()->json($tour->places);
+    }
+
     public function update($id, Request $request)
     {
         $log = new Logger(__CLASS__ . __METHOD__);
@@ -82,7 +88,7 @@ class TourController extends Controller
         return response()->json($map->with(['places', 'creator'])->first(), 200);
     }
 
-    public function getCoordWithMargin($userCoord)
+    private function getCoordWithMargin($userCoord)
     {
         $margin = 10;
         return [$userCoord - $margin, $userCoord + $margin];
@@ -216,58 +222,8 @@ class TourController extends Controller
         return response()->json($map);
     }
 
-    public function delete($id)
-    {
-        Tour::findOrFail($id)->delete();
-        return response('Deleted Successfully', 200);
-    }
 
-    public function createLocations($id, Request $request)
-    {
-        $log = new Logger(__CLASS__ . __METHOD__);
-        $log->debug('map_id:' . $id);
-
-        $map = Tour::find($id);
-        if ($map == null) {
-            return response()->json([
-                'type' => 'id',
-                'message' => 'The map no exist',
-            ], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            '*.name' => 'required|string',
-            '*.description' => 'required|string',
-            '*.lat' => 'required|numeric',
-            '*.lon' => 'required|numeric',
-            '*.order' => 'required|integer|min:0',
-        ]);
-
-        if ($validator->fails()) {
-            if ($validator->fails()) {
-                return response()->json([
-                    'type' => $validator->errors()->keys()[0],
-                    'message' => $validator->errors()->first(),
-                ], 401);
-            }
-        }
-
-        DB::transaction(function () use ($map, $request, $log) {
-            foreach ($request->json() as $row) {
-                $loc = new Place;
-                $loc->name = $row['name'];
-                $loc->description = $row['description'];
-                $loc->lat = $row['lat'];
-                $loc->lon = $row['lon'];
-                $loc->order = $row['order'];
-                $map->places()->save($loc);
-            }
-        });
-
-        return response()->json($map->places);
-    }
-
-    public function updateLocations($id, Request $request)
+    public function updatePlaces($id, Request $request)
     {
         $log = new Logger(__CLASS__ . __METHOD__);
         $log->debug('map_id:' . $id);
