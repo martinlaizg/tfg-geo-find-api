@@ -25,7 +25,6 @@ class UserController extends Controller
                 ['email', $email],
                 ['password', $password],
             ])->firstOrFail();
-            $log->debug("User: " . $user);
 
             return response()->json($user);
         } catch (Exception $e) {
