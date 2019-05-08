@@ -33,8 +33,14 @@ class PlayController extends Controller
         $tour_id = $request->input('tour_id');
 
         $log->debug('user_id=' . $user_id . ',tour_id=' . $tour_id);
-        $id = Play::where('user_id', $user_id)->where('tour_id', $tour_id)->first()->id;
-        return $this->getPlayById($id);
+        $play = Play::where('user_id', $user_id)->where('tour_id', $tour_id)->first();
+        if ($play == null) {
+            return response()->json([
+                'type' => 'exist',
+                'message' => 'The play does not exist',
+            ], 404);
+        }
+        return $this->getPlayById($play->id);
     }
 
     private function getPlayById($play_id)
