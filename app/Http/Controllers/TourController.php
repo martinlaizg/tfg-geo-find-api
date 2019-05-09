@@ -17,16 +17,15 @@ use Validator;
 class TourController extends Controller
 {
 
-	public function getPlaces($id)
+    public function getPlaces($id)
     {
         $tour = Tour::find($id);
         return response()->json($tour->places);
     }
 
-    public function update($id, Request $request)
+    public function update(Request $request, $id)
     {
         $log = new Logger(__CLASS__ . __METHOD__);
-        $log->debug($request);
 
         try {
             $map = Tour::findOrFail($id);
@@ -36,7 +35,6 @@ class TourController extends Controller
                 'message' => 'The map no exist',
             ], 404);
         }
-        $places_size = count($request->input('places'));
 
         // validate input
         $validator = Validator::make($request->all(), [
@@ -58,6 +56,15 @@ class TourController extends Controller
                     'message' => $validator->errors()->first(),
                 ], 401);
             }
+        }
+
+        $places = $request->input('places');
+        $response = $this->updateArrayPlaces($places, $id);
+        if ($response == false) {
+            return response()->json([
+                'type' => 'palces',
+                'message' => 'Error updating places',
+            ], 401);
         }
 
         DB::transaction(function () use ($map, $request, $log) {
@@ -222,12 +229,10 @@ class TourController extends Controller
         return response()->json($map);
     }
 
-
-    public function updatePlaces($id, Request $request)
+    public function updatePlaces(Request $request, $id)
     {
         $log = new Logger(__CLASS__ . __METHOD__);
         $log->debug('map_id:' . $id);
-        $log->debug($request);
 
         $map = Tour::find($id);
         if ($map == null) {
@@ -254,6 +259,7 @@ class TourController extends Controller
                 ], 401);
             }
         }
+        dd($request->all());
 
         $map->places()->update(['order' => null]);
 
@@ -269,9 +275,52 @@ class TourController extends Controller
                 $loc->save();
             }
         });
-
         return response()->json($map->places);
+    }
 
+    public function updateArrayPlaces($places, $tour_id)
+    {
+        $log = new Logger(__CLASS__ . __METHOD__);
+        $tour = Tour::find($tour_id);
+        usort($places, function ($a, $b) {
+            return ($a['order'] <=> $b['order']);
+        });
+
+        DB::beginTransaction();
+        try {
+            $tour->places()->update(['order' => null]);
+            foreach ($places as $place) {
+
+                if ($place['id'] == null || $place['id'] <= 0) { // Create place
+                    $newPlace = new Place();
+                    $newPlace->name = $place['name'];
+                    $newPlace->description = $place['description'];
+                    $newPlace->order = $place['order'];
+                    $newPlace->lat = $place['lat'];
+                    $newPlace->lon = $place['lon'];
+                    $newPlace->image = $place['image'];
+                    $tour->places()->save($newPlace);
+
+                } else { // Update place
+                    $p = Place::findOrFail($place['id']);
+                    $p->name = $place['name'];
+                    $p->description = $place['description'];
+                    $p->order = $place['order'];
+                    $p->lat = $place['lat'];
+                    $p->lon = $place['lon'];
+                    $p->image = $place['image'];
+                    $p->save();
+                }
+            }
+
+            DB::commit();
+        } catch (Exception $e) {
+            $log->info($e->getMessage());
+            DB::rollback();
+            return false;
+        }
+
+        return true;
     }
 
 }

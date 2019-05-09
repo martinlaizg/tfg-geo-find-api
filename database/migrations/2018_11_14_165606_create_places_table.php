@@ -18,13 +18,13 @@ class CreatePlacesTable extends Migration
             $table->unsignedInteger('tour_id');
             $table->string('name');
             $table->text('description');
-            $table->integer('order');
+            $table->integer('order')->nullable();
             $table->double('lat', 12, 8);
             $table->double('lon', 12, 8);
             $table->string('image')->default("");
             $table->timestamps();
 
-            $table->unique(['tour_id', 'order']);
+            // $table->unique(['tour_id', 'order']);
             $table->foreign('tour_id')->references('id')->on('tours')->onDelete('cascade');
 
         });

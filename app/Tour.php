@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Tour extends Model
 {
     protected $fillable = [
-        'name', 'country', 'state', 'city', 'min_level',
+        'name', 'description', 'image', 'min_level',
     ];
 
     protected $hidden = [
