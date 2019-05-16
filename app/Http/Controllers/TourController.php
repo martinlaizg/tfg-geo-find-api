@@ -40,7 +40,7 @@ class TourController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'description' => 'required|string',
-            'min_level' => ['required', Rule::in(['map', 'compas', 'therm'])],
+            'min_level' => ['required', Rule::in(['map', 'compass', 'therm'])],
             'places' => 'required|array|min:1',
             'places.*.name' => 'required|string',
             'places.*.description' => 'required|string',
