@@ -107,6 +107,6 @@ class UserController extends Controller
         $ticket->message = $message;
         $ticket->save();
 
-        return response("ok", 200);
+        return response()->json();
     }
 }
