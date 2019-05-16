@@ -62,7 +62,7 @@ class TourController extends Controller
         $response = $this->updateArrayPlaces($places, $id);
         if ($response == false) {
             return response()->json([
-                'type' => 'palces',
+                'type' => 'places',
                 'message' => 'Error updating places',
             ], 401);
         }
@@ -92,7 +92,7 @@ class TourController extends Controller
         $map->description = $request->input('description');
         $map->min_level = $request->input('min_level');
         $map->save();
-        return response()->json($map->with(['places', 'creator'])->first(), 200);
+        return response()->json(Tour::query()->with(['places', 'creator'])->find($map->id), 200);
     }
 
     private function getCoordWithMargin($userCoord)
@@ -298,7 +298,7 @@ class TourController extends Controller
                     $newPlace->order = $place['order'];
                     $newPlace->lat = $place['lat'];
                     $newPlace->lon = $place['lon'];
-                    $newPlace->image = $place['image'];
+                    // $newPlace->image = $place['image'] | "";
                     $tour->places()->save($newPlace);
 
                 } else { // Update place
@@ -308,7 +308,7 @@ class TourController extends Controller
                     $p->order = $place['order'];
                     $p->lat = $place['lat'];
                     $p->lon = $place['lon'];
-                    $p->image = $place['image'];
+                    // $p->image = $place['image'] | "";
                     $p->save();
                 }
             }
