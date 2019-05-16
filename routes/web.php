@@ -13,13 +13,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     //
     // User requests
-
     $router->post('users', ['uses' => 'UserController@create']);
     $router->get('users/{user_id}', ['uses' => 'UserController@get']);
 
     //
     // Tour requests
-
     $router->get('tours', ['uses' => 'TourController@getAll']);
     $router->post('tours', ['uses' => 'TourController@create']);
 
@@ -31,8 +29,12 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     //
     // Play requests
-
     $router->get('plays', ['uses' => 'PlayController@getPlay']);
     $router->post('plays', ['uses' => 'PlayController@createPlay']);
     $router->post('plays/{play_id}/places', ['uses' => 'PlayController@completePlace']);
+
+    //
+    // Send message
+    $router->post('support', ['uses' => 'UserController@postMessage']);
+
 });

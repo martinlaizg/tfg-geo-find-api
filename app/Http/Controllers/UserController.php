@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Ticket;
 use App\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -94,5 +95,18 @@ class UserController extends Controller
     {
         User::findOrFail($id)->delete();
         return response('Deleted Successfully', 200);
+    }
+
+    public function postMessage(Request $request)
+    {
+        $title = $request->input('title');
+        $message = $request->input('message');
+
+        $ticket = new Ticket();
+        $ticket->title = $title;
+        $ticket->message = $message;
+        $ticket->save();
+
+        return response("ok", 200);
     }
 }
