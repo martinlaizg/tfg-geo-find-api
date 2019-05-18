@@ -15,8 +15,8 @@ class CreatePlaysTable extends Migration
     {
         Schema::create('plays', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('tour_id');
-            $table->unsignedInteger('user_id');
+            $table->integer('tour_id')->unsigned();
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
 
             $table->unique(['tour_id', 'user_id']);

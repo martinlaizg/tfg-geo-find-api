@@ -15,7 +15,7 @@ class CreatePlacesTable extends Migration
     {
         Schema::create('places', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('tour_id');
+            $table->integer('tour_id')->unsigned();
             $table->string('name');
             $table->text('description');
             $table->integer('order')->nullable();

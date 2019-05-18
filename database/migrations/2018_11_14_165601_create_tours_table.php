@@ -18,7 +18,7 @@ class CreateToursTable extends Migration
             $table->string('name');
             $table->text('description');
             $table->string('image')->nullable();
-            $table->unsignedInteger('creator_id');
+            $table->integer('creator_id')->unsigned();
             $table->enum('min_level', ['therm', 'compass', 'map']);
             $table->timestamps();
 

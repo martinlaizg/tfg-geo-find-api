@@ -15,8 +15,8 @@ class CreatePlacePlayTable extends Migration
     {
         Schema::create('place_play', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('play_id');
-            $table->unsignedInteger('place_id');
+            $table->integer('play_id')->unsigned();
+            $table->integer('place_id')->unsigned();
             $table->timestamps();
 
             $table->unique(['play_id', 'place_id']);
