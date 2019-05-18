@@ -14,8 +14,8 @@ class CreatePlacesTable extends Migration
     public function up()
     {
         Schema::create('places', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('tour_id')->unsigned();
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('tour_id');
             $table->string('name');
             $table->text('description');
             $table->integer('order')->nullable();

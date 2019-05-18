@@ -14,11 +14,11 @@ class CreateToursTable extends Migration
     public function up()
     {
         Schema::create('tours', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('name');
             $table->text('description');
             $table->string('image')->nullable();
-            $table->integer('creator_id')->unsigned();
+            $table->unsignedBigInteger('creator_id');
             $table->enum('min_level', ['therm', 'compass', 'map']);
             $table->timestamps();
 

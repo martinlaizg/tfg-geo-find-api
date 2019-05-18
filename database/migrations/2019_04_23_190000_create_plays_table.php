@@ -14,9 +14,9 @@ class CreatePlaysTable extends Migration
     public function up()
     {
         Schema::create('plays', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('tour_id')->unsigned();
-            $table->integer('user_id')->unsigned();
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('tour_id');
+            $table->unsignedBigInteger('user_id');
             $table->timestamps();
 
             $table->unique(['tour_id', 'user_id']);
