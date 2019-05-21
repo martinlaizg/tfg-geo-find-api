@@ -19,9 +19,19 @@ class UserController extends Controller
         try {
             $email = $request->input('email');
             $password = $request->input('password');
+            $provider = $request->input('login_type');
 
             $log->info("Login email=" . $email);
-            $log->debug("Login password=" . $password);
+			$log->debug("Login password=" . $password);
+			
+			$user = User::where('email', $email)->first();
+			if($user == null){
+				return response()->json([
+					'type' => 'email',
+					'message' => 'Invalid email']
+					, 404);
+			}
+
             $user = User::where([
                 ['email', $email],
                 ['password', $password],
