@@ -12,6 +12,19 @@ use Validator;
 class UserController extends Controller
 {
 
+    public function registry(Request $request)
+    {
+        $email = $request->input('email');
+        $password = $request->input('password');
+        $provider = $request->input('provider');
+    }
+
+    public function handler(Request $request)
+    {
+        $log = new Logger(__METHOD__);
+        $log->debug($request);
+    }
+
     public function login(Request $request)
     {
         $log = new Logger(__METHOD__);
@@ -19,30 +32,34 @@ class UserController extends Controller
         try {
             $email = $request->input('email');
             $password = $request->input('password');
-            $provider = $request->input('login_type');
+            $provider = $request->input('provider');
 
             $log->info("Login email=" . $email);
-			$log->debug("Login password=" . $password);
-			
-			$user = User::where('email', $email)->first();
-			if($user == null){
-				return response()->json([
-					'type' => 'email',
-					'message' => 'Invalid email']
-					, 404);
-			}
+            $log->debug("Login password=" . $password);
+            $log->debug("Login provider=" . $provider);
 
-            $user = User::where([
-                ['email', $email],
-                ['password', $password],
-            ])->firstOrFail();
+            $user = User::where('email', $email)->first();
+            if ($user == null) {
+                return response()->json([
+                    'type' => 'email',
+                    'message' => 'Invalid email']
+                    , 404);
+            }
+            if ($provider == 'own') {
+                $user = User::where([
+                    ['email', $email],
+                    ['password', $password],
+                ])->firstOrFail();
+            } else {
+
+            }
 
             return response()->json($user);
         } catch (Exception $e) {
-            $log->debug("Invalid user or password");
+            $log->debug("Wrong password");
             return response()->json([
-                'type' => 'exist',
-                'message' => 'Invalid user or password']
+                'type' => 'password',
+                'message' => 'Wrong password']
                 , 404);
         }
     }
