@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Social;
 use App\Ticket;
 use App\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Laravel\Socialite\Facades\Socialite;
 use Monolog\Logger;
 use Validator;
+use \Google_Client;
 
 class UserController extends Controller
 {
@@ -20,10 +21,44 @@ class UserController extends Controller
         $provider = $request->input('provider');
     }
 
-    public function handler(Request $request)
+    public function loginProvider($provider, Request $request)
     {
         $log = new Logger(__METHOD__);
-        $log->debug($request);
+        if ($provider == "own") {
+            $log->debug('Own login, redirected');
+            return $this->login($request);
+        }
+        $token = $request->input('token');
+        $log->debug('token=' . $token);
+
+        $sub = "";
+        $email = "";
+
+        // Google login
+        if ($provider == 'google') {
+            $log->debug('login with google');
+            $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+            $payload = $client->verifyIdToken($token);
+            if ($payload) {
+                $sub = $payload['sub'];
+                $email = $payload['email'];
+            } else {
+                $log->debug("Wrong " . $provider . " login");
+                return response()->json([
+                    'type' => 'provider_login',
+                    'message' => 'Wrong login']
+                    , 400);
+            }
+        } else {
+            return response()->json([
+                'type' => 'provider',
+                'message' => 'Wrong provider']
+                , 400);
+        }
+
+        $user = Social::where('sub', $sub)->where('provider', $provider)->first()->user;
+
+        return response()->json($user);
     }
 
     public function login(Request $request)
@@ -33,30 +68,21 @@ class UserController extends Controller
         try {
             $email = $request->input('email');
             $password = $request->input('password');
-            $provider = $request->input('provider');
-            $token = $request->input('token');
 
             $log->info("Login email=" . $email);
             $log->debug("Login password=" . $password);
-            $log->info("Login provider=" . $provider);
-            $log->debug("Login token=" . $token);
 
-            if ($provider == 'own') {
-                $user = User::where('email', $email)->first();
-                if ($user == null) {
-                    return response()->json([
-                        'type' => 'email',
-                        'message' => 'Invalid email']
-                        , 404);
-                }
-                $user = User::where([
-                    ['email', $email],
-                    ['password', $password],
-                ])->firstOrFail();
-            } else {
-                $user = Socialite::driver($provider)->userFromToken($token);
-                $log->debug($user);
+            $user = User::where('email', $email)->first();
+            if ($user == null) {
+                return response()->json([
+                    'type' => 'email',
+                    'message' => 'Invalid email']
+                    , 404);
             }
+            $user = User::where([
+                ['email', $email],
+                ['password', $password],
+            ])->firstOrFail();
             return response()->json($user);
         } catch (Exception $e) {
             $log->debug("Wrong password");

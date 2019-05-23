@@ -1,5 +1,6 @@
 <?php
 
+use App\Social;
 use App\User;
 use Illuminate\Database\Seeder;
 
@@ -20,5 +21,10 @@ class UsersTableSeeder extends Seeder
         $user->user_type = 'admin';
         $user->image = 'https://avatars1.githubusercontent.com/u/16946027?s=460&v=4';
         $user->save();
+
+        $social = new Social();
+        $social->sub = "117424802040857292273";
+        $social->provider = 'google';
+        $user->socials()->save($social);
     }
 }

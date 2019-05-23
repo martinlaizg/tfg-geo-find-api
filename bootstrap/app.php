@@ -82,8 +82,6 @@ $app->singleton(
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
-$app->configure('services');
-
 $app->register(Laravel\Socialite\SocialiteServiceProvider::class);
 
 /*

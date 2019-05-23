@@ -55,4 +55,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->belongsToMany('App\Tour', 'plays', 'user_id', 'tour_id')->withTimestamps();
     }
 
+    public function socials()
+    {
+        return $this->hasMany('App\Social');
+    }
+
 }

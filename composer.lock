@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "b3a7d35ad3a59a489fbdb5e396a7deea",
@@ -3672,7 +3672,7 @@
                 },
                 {
                     "name": "Gert de Pagter",
-                    "email": "BackEndTea@gmail.com"
+                    "email": "backendtea@gmail.com"
                 }
             ],
             "description": "Symfony polyfill for ctype functions",
@@ -4183,62 +4183,6 @@
         }
     ],
     "packages-dev": [
-        {
-            "name": "coderello/laravel-passport-social-grant",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/coderello/laravel-passport-social-grant.git",
-                "reference": "4d2ea83cfc9c8b1a3d8bda0ec4db391e09ddbe2e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/coderello/laravel-passport-social-grant/zipball/4d2ea83cfc9c8b1a3d8bda0ec4db391e09ddbe2e",
-                "reference": "4d2ea83cfc9c8b1a3d8bda0ec4db391e09ddbe2e",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/passport": "^6.0|^7.0",
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1.1",
-                "orchestra/testbench": "~3.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Coderello\\SocialGrant\\Providers\\SocialGrantServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Coderello\\SocialGrant\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ilya Sakovich",
-                    "email": "me@hivokas.com"
-                }
-            ],
-            "description": "Social Grant for Laravel Passport",
-            "keywords": [
-                "grant",
-                "laravel",
-                "network",
-                "oauth",
-                "passport",
-                "social"
-            ],
-            "time": "2019-03-19T08:23:16+00:00"
-        },
         {
             "name": "doctrine/instantiator",
             "version": "1.2.0",
