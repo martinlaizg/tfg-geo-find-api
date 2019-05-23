@@ -10,7 +10,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('', ['uses' => 'HomeController@home']);
 
     $router->post('login', ['uses' => 'UserController@login']);
-    $router->pu('login', ['uses' => 'UserController@registry']);
+    $router->put('login', ['uses' => 'UserController@registry']);
     $router->post('login/handler', ['uses' => 'UserController@handler']);
 
     //

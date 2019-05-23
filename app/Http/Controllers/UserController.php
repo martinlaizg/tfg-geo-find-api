@@ -6,6 +6,7 @@ use App\Ticket;
 use App\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
 use Monolog\Logger;
 use Validator;
 
@@ -33,27 +34,29 @@ class UserController extends Controller
             $email = $request->input('email');
             $password = $request->input('password');
             $provider = $request->input('provider');
+            $token = $request->input('token');
 
             $log->info("Login email=" . $email);
             $log->debug("Login password=" . $password);
-            $log->debug("Login provider=" . $provider);
+            $log->info("Login provider=" . $provider);
+            $log->debug("Login token=" . $token);
 
-            $user = User::where('email', $email)->first();
-            if ($user == null) {
-                return response()->json([
-                    'type' => 'email',
-                    'message' => 'Invalid email']
-                    , 404);
-            }
             if ($provider == 'own') {
+                $user = User::where('email', $email)->first();
+                if ($user == null) {
+                    return response()->json([
+                        'type' => 'email',
+                        'message' => 'Invalid email']
+                        , 404);
+                }
                 $user = User::where([
                     ['email', $email],
                     ['password', $password],
                 ])->firstOrFail();
             } else {
-
+                $user = Socialite::driver($provider)->userFromToken($token);
+                $log->debug($user);
             }
-
             return response()->json($user);
         } catch (Exception $e) {
             $log->debug("Wrong password");
