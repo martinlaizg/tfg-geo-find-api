@@ -11,7 +11,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     $router->post('login', ['uses' => 'UserController@login']);
     $router->post('login/{provider}', ['uses' => 'UserController@loginProvider']);
-    $router->put('login', ['uses' => 'UserController@registry']);
 
     //
     // User requests

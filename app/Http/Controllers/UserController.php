@@ -5,21 +5,14 @@ namespace App\Http\Controllers;
 use App\Social;
 use App\Ticket;
 use App\User;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Monolog\Logger;
 use Validator;
 use \Google_Client;
 
 class UserController extends Controller
 {
-
-    public function registry(Request $request)
-    {
-        $email = $request->input('email');
-        $password = $request->input('password');
-        $provider = $request->input('provider');
-    }
 
     public function loginProvider($provider, Request $request)
     {
@@ -29,24 +22,34 @@ class UserController extends Controller
             return $this->login($request);
         }
         $token = $request->input('token');
+        if ($token == null) {
+            return response()->json([
+                'type' => 'token',
+                'message' => 'Token is required']
+                , 400);
+        }
         $log->debug('token=' . $token);
 
         $sub = "";
         $email = "";
+        $name = null;
+        $image = null;
 
         // Google login
         if ($provider == 'google') {
             $log->debug('login with google');
             $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-            $payload = $client->verifyIdToken($token);
+			$payload = $client->verifyIdToken($token);
             if ($payload) {
                 $sub = $payload['sub'];
                 $email = $payload['email'];
+                $name = $payload['name'];
+                $image = $payload['picture'];
             } else {
                 $log->debug("Wrong " . $provider . " login");
                 return response()->json([
-                    'type' => 'provider_login',
-                    'message' => 'Wrong login']
+                    'type' => 'token',
+                    'message' => 'Invalid token']
                     , 400);
             }
         } else {
@@ -55,8 +58,28 @@ class UserController extends Controller
                 'message' => 'Wrong provider']
                 , 400);
         }
+        if ($sub == null || $provider == null) {
+            return response()->json([
+                'type' => 'provider_login',
+                'message' => 'Error login provider']
+                , 400);
+        }
 
-        $user = Social::where('sub', $sub)->where('provider', $provider)->first()->user;
+        $social = Social::where('sub', $sub)->where('provider', $provider)->first();
+        $user = User::where('email', $email)->first();
+        if ($user == null) {
+            $user = new User;
+            $user->email = $email;
+            $user->name = $name;
+            $user->image = $image;
+            $user->save();
+        }
+        if ($social == null) {
+            $social = new Social;
+            $social->sub = $sub;
+            $social->provider = $provider;
+            $user->socials()->save($social);
+        }
 
         return response()->json($user);
     }
@@ -107,13 +130,11 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
-        $log = new Logger('UserController - createUser');
+		$log = new Logger('UserController - createUser');
+		$log->debug($request);
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users',
-            'username' => 'required|unique:users',
-            'name' => 'required',
             'password' => 'required',
-            'user_type' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -124,18 +145,9 @@ class UserController extends Controller
         }
 
         $u = new User;
-        try {
-            $u->email = $request->input('email');
-            $u->name = $request->input('name');
-            $u->username = $request->input('username');
-            $u->password = $request->input('password');
-            $u->user_type = $request->input('user_type');
-            $log->debug($u);
-            $u->save();
-        } catch (QueryException $e) {
-            $log->debug(__FUNCTION__ . "() in " . __FILE__ . " at " . __LINE__ . " // " . $e->getMessage());
-            return response()->json(['error' => 1, 'message' => 'QueryException'], 500);
-        }
+        $u->email = $request->input('email');
+        $u->password = $request->input('password');
+        $u->save();
         return response()->json($u);
     }
 
