@@ -16,6 +16,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // User requests
     $router->post('users', ['uses' => 'UserController@create']);
     $router->get('users/{user_id}', ['uses' => 'UserController@get']);
+    $router->put('users/{user_id}', ['uses' => 'UserController@update']);
 
     //
     // Tour requests
