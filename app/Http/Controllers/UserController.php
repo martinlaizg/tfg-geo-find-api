@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Social;
 use App\Ticket;
 use App\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Monolog\Logger;
@@ -18,13 +17,11 @@ class UserController extends Controller
     public function update($user_id, Request $request)
     {
         $log = new Logger(__METHOD__);
+        $log->info('user=' . $user_id);
 
         $user = User::find($user_id);
         if ($user == null) {
-            return response()->json([
-                'type' => 'exist',
-                'message' => 'The user do not exist',
-            ], 404);
+            return response()->json(['type' => 'exist', 'message' => 'The user do not exist'], 404);
         }
 
         $validator = Validator::make($request->all(), [
@@ -36,10 +33,7 @@ class UserController extends Controller
             'user.secure' => 'string',
         ]);
         if ($validator->fails()) {
-            return response()->json([
-                'type' => $validator->errors()->keys()[0],
-                'message' => $validator->errors()->first(),
-            ], 401);
+            return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
         }
 
         $provider = $request->input('provider');
@@ -55,15 +49,15 @@ class UserController extends Controller
                 $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
                 $payload = $client->verifyIdToken($secure);
             }
+            // add more providers here
 
-            $sub = null;
-            if ($payload != null) {
-                $sub = $payload['sub'];
-            } else {
+            if ($payload == null) {
                 return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
             }
 
-            if ($payload == null || $sub == null) {
+            $sub = $payload['sub'];
+
+            if ($sub == null) {
                 return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
             }
             $token_user = Social::where('sub', $sub)->where('provider', $provider)->first()->user;
@@ -73,19 +67,19 @@ class UserController extends Controller
         }
         $user->name = $request->input('user.name');
         $user->email = $request->input('user.email');
-        $user->username = $request->input('user.username');
+		$user->username = $request->input('user.username');
+		$password = $request->input('user.secure');
+		if($password!=null){
+			$user->password = $password;
+		}
         $user->save();
 
         return response()->json($user, 200);
     }
 
-    public function loginProvider($provider, Request $request)
+    public function login(Request $request)
     {
         $log = new Logger(__METHOD__);
-        if ($provider == 'own') {
-            $log->debug('Own login, redirected');
-            return $this->login($request);
-        }
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -96,107 +90,64 @@ class UserController extends Controller
             return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
         }
 
+        $email = $request->input('email');
+        $provider = $request->input('provider');
         $secure = $request->input('secure');
-        $log->debug('secure=' . $secure);
+        //$log->debug('secure=' . $secure);
 
         $sub = '';
-        $email = '';
         $name = null;
         $image = null;
 
+        $log->debug('login with ' . $provider);
         // Google login
         if ($provider == 'google') {
-            $log->debug('login with google');
             $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
             $payload = $client->verifyIdToken($secure);
             if ($payload) {
                 $sub = $payload['sub'];
-                $email = $payload['email'];
+                $token_email = $payload['email'];
                 $name = $payload['name'];
                 $image = $payload['picture'];
-            } else {
-                $log->debug('Wrong ' . $provider . ' login');
+            }
+            if (!$payload || $email != $token_email) {
+                $log->debug('Wrong login');
                 return response()->json(['type' => 'secure', 'message' => 'Invalid token'], 400);
             }
-        } else {
-            return response()->json(['type' => 'provider', 'message' => 'Wrong provider'], 400);
-        }
-        if ($sub == null || $provider == null) {
-            return response()->json(['type' => 'provider_login', 'message' => 'Error login provider'], 400);
         }
 
-        $social = Social::where('sub', $sub)->where('provider', $provider)->first();
         $user = User::where('email', $email)->first();
         if ($user == null) {
+            if ($provider == 'own') {
+                $log->debug('Wrong login');
+                return response()->json(['type' => 'secure', 'message' => 'Invalid token'], 400);
+            }
             $user = new User;
             $user->email = $email;
             $user->name = $name;
             $user->image = $image;
             $user->save();
         }
+
+        $social = $user->socials()->where('provider', $provider)->first();
         if ($social == null) {
             $social = new Social;
             $social->sub = $sub;
             $social->provider = $provider;
             $user->socials()->save($social);
-        }
-
+		}else if($social->sub != $sub ){
+			$log->debug('Wrong sub');
+			return response()->json(['type' => 'token', 'message' => 'Invalid token'], 400);
+		}
+		
         return response()->json($user);
-    }
-
-    public function login(Request $request)
-    {
-        $log = new Logger(__METHOD__);
-
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users',
-            'secure' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'type' => $validator->errors()->keys()[0],
-                'message' => $validator->errors()->first(),
-            ], 401);
-        }
-
-        try {
-
-            $email = $request->input('email');
-            $secure = $request->input('secure');
-
-            $log->info('Login email=' . $email);
-            $log->debug('Login secure=' . $secure);
-
-            $user = User::where('email', $email)->first();
-            if ($user == null) {
-                return response()->json([
-                    'type' => 'email',
-                    'message' => 'Invalid email']
-                    , 404);
-            }
-            $user = User::where([
-                ['email', $email],
-                ['password', $secure],
-            ])->firstOrFail();
-            return response()->json($user);
-        } catch (ModelNotFoundException $e) {
-            $log->debug('Wrong secure');
-            return response()->json([
-                'type' => 'secure',
-                'message' => 'Wrong secure']
-                , 404);
-        }
     }
 
     public function get($id)
     {
         $user = User::find($id);
         if ($user == null) {
-            return response()->json([
-                'type' => 'id',
-                'message' => 'El id no existe',
-            ], 404);
+            return response()->json(['type' => 'id', 'message' => 'El id no existe'], 404);
         }
         return response()->json($user, 200);
     }
@@ -211,10 +162,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'type' => $validator->errors()->keys()[0],
-                'message' => $validator->errors()->first(),
-            ], 401);
+            return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
         }
 
         $u = new User;
