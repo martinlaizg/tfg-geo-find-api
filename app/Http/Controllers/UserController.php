@@ -14,149 +14,162 @@ use \Google_Client;
 class UserController extends Controller
 {
 
-    public function loginProvider($provider, Request $request)
+    public function update($user_id, Request $request)
     {
         $log = new Logger(__METHOD__);
-        if ($provider == "own") {
-            $log->debug('Own login, redirected');
-            return $this->login($request);
-        }
-        $token = $request->input('token');
-        if ($token == null) {
-            return response()->json([
-                'type' => 'token',
-                'message' => 'Token is required']
-                , 400);
-        }
-        $log->debug('token=' . $token);
+        $log->info('user=' . $user_id);
 
-        $sub = "";
-        $email = "";
-        $name = null;
-        $image = null;
+        $user = User::find($user_id);
+        if ($user == null) {
+            return response()->json(['type' => 'exist', 'message' => 'The user do not exist'], 404);
+        }
 
-        // Google login
-        if ($provider == 'google') {
-            $log->debug('login with google');
-            $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-			$payload = $client->verifyIdToken($token);
-            if ($payload) {
-                $sub = $payload['sub'];
-                $email = $payload['email'];
-                $name = $payload['name'];
-                $image = $payload['picture'];
-            } else {
-                $log->debug("Wrong " . $provider . " login");
-                return response()->json([
-                    'type' => 'token',
-                    'message' => 'Invalid token']
-                    , 400);
+        $validator = Validator::make($request->all(), [
+            'provider' => ['required', Rule::in(['own', 'google'])],
+            'secure' => 'required|string',
+            'user.email' => 'email',
+            'user.name' => 'string',
+            'user.username' => 'string',
+            'user.secure' => 'string',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
+        }
+
+        $provider = $request->input('provider');
+        $secure = $request->input('secure');
+
+        if ($provider == 'own') {
+            if ($user->password != $secure) {
+                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
             }
         } else {
-            return response()->json([
-                'type' => 'provider',
-                'message' => 'Wrong provider']
-                , 400);
-        }
-        if ($sub == null || $provider == null) {
-            return response()->json([
-                'type' => 'provider_login',
-                'message' => 'Error login provider']
-                , 400);
-        }
+            $payload = null;
+            if ($provider == 'google') {
+                $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+                $payload = $client->verifyIdToken($secure);
+            }
+            // add more providers here
 
-        $social = Social::where('sub', $sub)->where('provider', $provider)->first();
-        $user = User::where('email', $email)->first();
-        if ($user == null) {
-            $user = new User;
-            $user->email = $email;
-            $user->name = $name;
-            $user->image = $image;
-            $user->save();
-        }
-        if ($social == null) {
-            $social = new Social;
-            $social->sub = $sub;
-            $social->provider = $provider;
-            $user->socials()->save($social);
-        }
+            if ($payload == null) {
+                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
+            }
 
-        return response()->json($user);
+            $sub = $payload['sub'];
+
+            if ($sub == null) {
+                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
+            }
+            $token_user = Social::where('sub', $sub)->where('provider', $provider)->first()->user;
+            if ($token_user->id != $user->id) {
+                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
+            }
+        }
+        $user->name = $request->input('user.name');
+        $user->email = $request->input('user.email');
+		$user->username = $request->input('user.username');
+		$password = $request->input('user.secure');
+		if($password!=null){
+			$user->password = $password;
+		}
+        $user->save();
+
+        return response()->json($user, 200);
     }
 
     public function login(Request $request)
     {
         $log = new Logger(__METHOD__);
 
-        try {
-            $email = $request->input('email');
-            $password = $request->input('password');
-
-            $log->info("Login email=" . $email);
-            $log->debug("Login password=" . $password);
-
-            $user = User::where('email', $email)->first();
-            if ($user == null) {
-                return response()->json([
-                    'type' => 'email',
-                    'message' => 'Invalid email']
-                    , 404);
-            }
-            $user = User::where([
-                ['email', $email],
-                ['password', $password],
-            ])->firstOrFail();
-            return response()->json($user);
-        } catch (Exception $e) {
-            $log->debug("Wrong password");
-            return response()->json([
-                'type' => 'password',
-                'message' => 'Wrong password']
-                , 404);
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'provider' => ['required', Rule::in(['own', 'google'])],
+            'secure' => 'required|string',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
         }
+
+        $email = $request->input('email');
+        $provider = $request->input('provider');
+        $secure = $request->input('secure');
+        //$log->debug('secure=' . $secure);
+
+        $sub = '';
+        $name = null;
+        $image = null;
+
+        $log->debug('login with ' . $provider);
+        // Google login
+        if ($provider == 'google') {
+            $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+            $payload = $client->verifyIdToken($secure);
+            if ($payload) {
+                $sub = $payload['sub'];
+                $token_email = $payload['email'];
+                $name = $payload['name'];
+                $image = $payload['picture'];
+            }
+            if (!$payload || $email != $token_email) {
+                $log->debug('Wrong login');
+                return response()->json(['type' => 'secure', 'message' => 'Invalid token'], 400);
+            }
+        }
+
+        $user = User::where('email', $email)->first();
+        if ($user == null) {
+            if ($provider == 'own') {
+                $log->debug('Wrong login');
+                return response()->json(['type' => 'secure', 'message' => 'Invalid token'], 400);
+            }
+            $user = new User;
+            $user->email = $email;
+            $user->name = $name;
+            $user->image = $image;
+            $user->save();
+        }
+
+        $social = $user->socials()->where('provider', $provider)->first();
+        if ($social == null) {
+            $social = new Social;
+            $social->sub = $sub;
+            $social->provider = $provider;
+            $user->socials()->save($social);
+		}else if($social->sub != $sub ){
+			$log->debug('Wrong sub');
+			return response()->json(['type' => 'token', 'message' => 'Invalid token'], 400);
+		}
+		
+        return response()->json($user);
     }
 
     public function get($id)
     {
         $user = User::find($id);
         if ($user == null) {
-            return response()->json([
-                'type' => 'id',
-                'message' => 'El id no existe',
-            ], 404);
+            return response()->json(['type' => 'id', 'message' => 'El id no existe'], 404);
         }
         return response()->json($user, 200);
     }
 
     public function create(Request $request)
     {
-		$log = new Logger('UserController - createUser');
-		$log->debug($request);
+        $log = new Logger('UserController - createUser');
+        $log->debug($request);
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users',
-            'password' => 'required',
+            'secure' => 'required|string',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'type' => $validator->errors()->keys()[0],
-                'message' => $validator->errors()->first(),
-            ], 401);
+            return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
         }
 
         $u = new User;
         $u->email = $request->input('email');
-        $u->password = $request->input('password');
+        $u->password = $request->input('secure');
         $u->save();
         return response()->json($u);
-    }
-
-    public function update($id, Request $request)
-    {
-        $user = User::findOrFail($id);
-        $user->update($request->all());
-
-        return response()->json($user, 200);
     }
 
     public function delete($id)

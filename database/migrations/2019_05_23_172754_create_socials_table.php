@@ -21,6 +21,7 @@ class CreateSocialsTable extends Migration
             $table->timestamps();
 
             $table->unique(['user_id', 'provider']);
+            $table->unique(['sub', 'provider']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
         });

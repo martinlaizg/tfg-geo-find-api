@@ -10,12 +10,12 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('', ['uses' => 'HomeController@home']);
 
     $router->post('login', ['uses' => 'UserController@login']);
-    $router->post('login/{provider}', ['uses' => 'UserController@loginProvider']);
 
     //
     // User requests
     $router->post('users', ['uses' => 'UserController@create']);
     $router->get('users/{user_id}', ['uses' => 'UserController@get']);
+    $router->put('users/{user_id}', ['uses' => 'UserController@update']);
 
     //
     // Tour requests
