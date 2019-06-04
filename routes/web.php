@@ -9,34 +9,33 @@
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('', ['uses' => 'HomeController@home']);
 
-    // User endpoints
-    $router->group(['prefix' => 'users'], function () use ($router) {
-        $router->get('', ['uses' => 'UserController@getAll']);
-        $router->post('', ['uses' => 'UserController@create']);
-        $router->get('/{id}', ['uses' => 'UserController@get']);
-        $router->put('/{id}', ['uses' => 'UserController@update']);
-        $router->delete('/{id}', ['uses' => 'UserController@delete']);
-    });
+    $router->post('login', ['uses' => 'UserController@login']);
 
-    // Map endpoints
-    $router->group(['prefix' => 'maps'], function () use ($router) {
-        $router->get('', ['uses' => 'MapController@getAll']);
-        $router->post('', ['uses' => 'MapController@create']);
-        $router->get('/{id}', ['uses' => 'MapController@get']);
-        $router->put('/{id}', ['uses' => 'MapController@update']);
-        $router->delete('/{id}', ['uses' => 'MapController@delete']);
-    });
+    //
+    // User requests
+    $router->post('users', ['uses' => 'UserController@create']);
+    $router->get('users/{user_id}', ['uses' => 'UserController@get']);
+    $router->put('users/{user_id}', ['uses' => 'UserController@update']);
 
-    // Location endpoints
-    $router->group(['prefix' => 'locations'], function () use ($router) {
-        $router->get('', ['uses' => 'LocationController@getAll']);
-        $router->post('', ['uses' => 'LocationController@create']);
-        $router->get('/{id}', ['uses' => 'LocationController@get']);
-        $router->put('/{id}', ['uses' => 'LocationController@update']);
-        $router->delete('/{id}', ['uses' => 'LocationController@delete']);
-    });
+    //
+    // Tour requests
+    $router->get('tours', ['uses' => 'TourController@getAll']);
+    $router->post('tours', ['uses' => 'TourController@create']);
 
-    // Search endpoints
-    $router->get('/search', ['uses' => 'SearchController@search']);
+    $router->get('tours/{tour_id}', ['uses' => 'TourController@getSingleTour']);
+    $router->put('tours/{tour_id}', ['uses' => 'TourController@update']);
+
+    $router->get('tours/{tour_id}/places', ['uses' => 'TourController@getPlaces']);
+    $router->put('tours/{tour_id}/places', ['uses' => 'TourController@updatePlaces']);
+
+    //
+    // Play requests
+    $router->get('plays', ['uses' => 'PlayController@getPlay']);
+    $router->post('plays', ['uses' => 'PlayController@createPlay']);
+    $router->post('plays/{play_id}/places', ['uses' => 'PlayController@completePlace']);
+
+    //
+    // Send message
+    $router->post('support', ['uses' => 'UserController@postMessage']);
 
 });

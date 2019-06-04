@@ -3,38 +3,7 @@ title: GeoFind API
 version: v1
 baseUri: https://localhost:8000/api
 mediaType:  application/json
-types:
-  User:
-    properties:
-      name:
-        type: string
-        example: "Martin Laiz Gomez"
-      username:
-        type: string
-        example: "martinlaizg"
-      email:
-        type: string
-        example: "martinlaizg@gmail.com"
-      password:
-        type: string
-        example: "MyPassWOrd123"
-      bdate?:
-        type: date-only
-        example: "1999-01-23"
-  Location:
-    properties:
-      lat:
-        type: string
-      lon:
-        type: string
-  Map:
-    properties:
-      locations:
-        type: array
-        items: Location
-      minLevel:
-        type: string
-
+types: !include schemas/types.raml
 
 /users:
   description: Usuarios de la aplicacion
@@ -45,7 +14,7 @@ types:
         description: No hay error
         body:
           application/json:
-            type: User[]
+
   post:
     description: Crea un usuario
     body:
@@ -55,7 +24,8 @@ types:
         description: Se ha creado el usuario correctamente
         body:
           application/json:
-            type: User[]
+            type: User
+
   /{id}:
     get:
       description: Obtener un usuarios
@@ -83,7 +53,16 @@ types:
 /maps:
   description: Mapas de juego
   get:
-    description: Obtiene todos los mapas
+    description: Obtiene mapas según los parametros
+    queryParameters:
+      coords?:
+        description: Coordenadas del usuario
+        type: String
+        example: "12.323914,133.96344"
+      user?:
+        description: Usuario para filtrar mapas
+        type: integer
+        example: 2
     responses:
       200:
         description: Se obtienen todos los mapas
@@ -177,3 +156,42 @@ types:
         description: Campo de búsqueda (opcional)
         type: string
         example: "Valencia"
+    responses:
+      200:
+        description: Búsqueda correcta
+        body:
+          application/json:
+            type: array
+            items: Map
+/login:
+  description: Inicio de sesión de un usuario
+  post:
+    description: Un usuario realiza el inicio de sesión
+    body:
+      application/json:
+        properties:
+          email:
+            type: string
+            example: myemail@email.com
+          password:
+            type: string
+            example: MyPaSWORD1234
+    responses:
+      200:
+        description: Todo ha ido bien
+        body:
+          application/json:
+            type: User
+/register:
+  description: Inicio de sesión de un usuario
+  post:
+    description: Un usuario realiza el inicio de sesión
+    body:
+      application/json:
+        type: User
+    responses:
+      200:
+        description: Todo ha ido bien
+        body:
+          application/json:
+            type: User

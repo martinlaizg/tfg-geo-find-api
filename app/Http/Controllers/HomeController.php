@@ -12,9 +12,8 @@ class HomeController extends Controller
 
     public function routeNotFound()
     {
-		return response()->json([
-			'message' => 'Ruta no disponible'
-		]);
+        return response()->json([
+            'message' => 'Ruta no disponible',
+        ]);
     }
-
 }

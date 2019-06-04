@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersTable extends Migration
+class CreateToursTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,16 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('tours', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('email')->unique();
-            $table->string('username')->unique()->nullable();
-            $table->string('password')->nullable();
-            $table->string('name')->nullable();
+            $table->string('name');
+            $table->text('description');
             $table->string('image')->nullable();
-            $table->enum('user_type', ['admin', 'creator', 'user'])->default('user');
+            $table->unsignedBigInteger('creator_id');
+            $table->enum('min_level', ['therm', 'compass', 'map']);
             $table->timestamps();
+
+            $table->foreign('creator_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -32,6 +33,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('tours');
     }
 }
