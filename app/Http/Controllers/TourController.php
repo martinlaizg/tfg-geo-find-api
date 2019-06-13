@@ -28,7 +28,7 @@ class TourController extends Controller
         $log = new Logger(__CLASS__ . __METHOD__);
 
         try {
-            $map = Tour::findOrFail($id);
+            $tour = Tour::findOrFail($id);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'type' => 'id',
@@ -44,6 +44,10 @@ class TourController extends Controller
             'places' => 'required|array|min:1',
             'places.*.name' => 'required|string',
             'places.*.description' => 'required|string',
+            'places.*.question' => 'required|string|distinct',
+            'places.*.answer' => 'required|string',
+            'places.*.answer2' => 'required|string',
+            'places.*.answer3' => 'required|string',
             'places.*.lat' => 'required|numeric',
             'places.*.lon' => 'required|numeric',
             'places.*.order' => 'required|numeric|distinct',
@@ -67,12 +71,12 @@ class TourController extends Controller
             ], 401);
         }
 
-        DB::transaction(function () use ($map, $request, $log) {
-            $map->places()->update(['order' => null]);
+        DB::transaction(function () use ($tour, $request, $log) {
+            $tour->places()->update(['order' => null]);
             foreach ($request->input('places') as $row) {
                 $id = $row['id'];
                 if ($id != null) {
-                    $loc = $map->places()->find($id);
+                    $loc = $tour->places()->find($id);
                 } else {
                     $loc = new Place;
                 }
@@ -84,15 +88,15 @@ class TourController extends Controller
                 if ($id != null) {
                     $loc->save();
                 } else {
-                    $map->places()->save($loc);
+                    $tour->places()->save($loc);
                 }
             }
         });
-        $map->name = $request->input('name');
-        $map->description = $request->input('description');
-        $map->min_level = $request->input('min_level');
-        $map->save();
-        return response()->json(Tour::query()->with(['places', 'creator'])->find($map->id), 200);
+        $tour->name = $request->input('name');
+        $tour->description = $request->input('description');
+        $tour->min_level = $request->input('min_level');
+        $tour->save();
+        return response()->json(Tour::query()->with(['places', 'creator'])->find($tour->id), 200);
     }
 
     private function getCoordWithMargin($userCoord)
@@ -106,7 +110,7 @@ class TourController extends Controller
         try {
             $log = new Logger(__CLASS__ . __METHOD__);
             $coords = $request->input('coords');
-            $maps = Tour::query();
+            $tours = Tour::query();
             if ($coords != '') {
                 $log->debug('coords=' . $coords);
                 $userLat = strtok($coords, ',');
@@ -115,7 +119,7 @@ class TourController extends Controller
                 $lon = $this->getCoordWithMargin($userLon);
                 $log->debug('lat=' . $userLat . '; range=(' . implode(',', $lat) . ')');
                 $log->debug('lon=' . $userLon . '; range=(' . implode(',', $lon) . ')');
-                $maps = $maps->whereHas('places', function ($query) use ($lat, $lon) {
+                $tours = $tours->whereHas('places', function ($query) use ($lat, $lon) {
                     $query->whereBetween('lat', $lat)->whereBetween('lon', $lon);
                 });
             }
@@ -138,13 +142,13 @@ class TourController extends Controller
                     }
                 }
                 if ($creator_id > 0) {
-                    $maps = $maps->where('creator_id', $creator_id);
+                    $tours = $tours->where('creator_id', $creator_id);
                 }
             }
             $search = $request->input('q');
             if ($search != '') {
                 $log->debug('search=' . $search);
-                $maps = $maps
+                $tours = $tours
                     ->where('name', 'like', '%' . $search)
                     ->orWhere('name', 'like', $search . '%')
                     ->orWhere('name', 'like', '%' . $search . '%')
@@ -158,7 +162,7 @@ class TourController extends Controller
                     ->orWhere('city', 'like', '%' . $search)
                     ->orWhere('city', 'like', '%' . $search . '%');
             }
-            return response()->json($maps->with(['creator', 'places' => function ($query) {
+            return response()->json($tours->with(['creator', 'places' => function ($query) {
                 $query->orderBy('order');
             }])->get(), 200);
 
@@ -172,14 +176,14 @@ class TourController extends Controller
         $log = new Logger(__CLASS__ . __METHOD__);
         $log->debug('map_id=' . $id);
 
-        $map = Tour::where('id', $id)->with(['creator', 'places'])->first();
-        if ($map == null) {
+        $tour = Tour::where('id', $id)->with(['creator', 'places'])->first();
+        if ($tour == null) {
             return response()->json([
                 'type' => 'id',
                 'message' => 'The tour no exist',
             ], 404);
         }
-        return response()->json($map);
+        return response()->json($tour);
     }
 
     public function create(Request $request)
@@ -189,44 +193,79 @@ class TourController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'description' => 'required',
+            'image' => 'string',
             'min_level' => 'required',
             'creator_id' => 'required|exists:users,id',
             'places' => 'required|array|min:1',
             'places.*.name' => 'required|string',
             'places.*.description' => 'required|string',
-            'places.*.lat' => 'required|numeric',
-            'places.*.lon' => 'required|numeric',
-            'places.*.order' => 'required|numeric|distinct',
+            'places.*.image' => 'string',
+            'places.*.order' => 'required|numeric|distinct|min:0',
+            'places.*.lat' => 'required|numeric|min:-90|max:90',
+            'places.*.lon' => 'required|numeric|min:-180|max:180',
+            'places.*.question' => 'string|distinct',
+            'places.*.answer' => 'string',
+            'places.*.answer2' => 'string',
+            'places.*.answer3' => 'string',
         ]);
         if ($validator->fails()) {
             if ($validator->fails()) {
-                return response()->json([
-                    'type' => $validator->errors()->keys()[0],
-                    'message' => $validator->errors()->first(),
-                ], 401);
+                return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
             }
-        }
-        $map = new Tour;
-        DB::transaction(function () use ($request, $map) {
-            $map->name = $request->input('name');
-            $map->description = $request->input('description');
-            $map->min_level = $request->input('min_level');
-            $map->image = $request->input('image') != null ? $request->input('image') : "";
-            $creator = User::find($request->input('creator_id'));
-            $creator->createdTours()->save($map);
-            foreach ($request->input('places') as $row) {
-                $place = new Place;
-                $place->name = $row['name'];
-                $place->description = $row['description'];
-                $place->lat = $row['lat'];
-                $place->lon = $row['lon'];
-                $place->order = $row['order'];
-                $map->places()->save($place);
-            }
-            $map->load(['creator', 'places']);
-        });
+		}
+		
+		// Create the tour
+        DB::beginTransaction();
+        $tour = new Tour;
+        $tour->name = $request->input('name');
+        $tour->description = $request->input('description');
+        $tour->min_level = $request->input('min_level');
+        $tour->image = $request->input('image');
+        $creator = User::find($request->input('creator_id'));
+        $creator->createdTours()->save($tour);
 
-        return response()->json($map);
+        //sort places to check the order
+        $places = $request->input('places');
+        usort($places, function ($a, $b) {
+            return ($a['order'] <=> $b['order']);
+        });
+        $last = end($places);
+        if ((count($places) - 1) != $last['order']) {
+            return response()->json(['type' => 'order', 'message' => 'Wrong place order'], 401);
+        }
+		// Create places
+        foreach ($places as $entry) {
+            $place = new Place;
+            $place->name = $entry['name'];
+            $place->description = $entry['description'];
+            $place->image = $entry['image'];
+            $place->order = (int) $entry['order'];
+            $place->lat = (double) $entry['lat'];
+            $place->lon = (double) $entry['lon'];
+
+            $question = isset($entry['question']);
+            if ($question) {
+                $place->question = $entry['question'];
+                // If question is setted, check answers
+                if (!isset($entry['answer']) || !isset($entry['answer2']) || !isset($entry['answer3'])) {
+                    DB::rollback();
+                    return response()->json(['type' => 'answers', 'message' => 'The three answers are required'], 401);
+                }
+                $place->answer = strval($entry['answer']);
+                $place->answer2 = strval($entry['answer2']);
+                $place->answer3 = strval($entry['answer3']);
+                // Check repeated answers
+                if ($place->answer == $place->answer2 || $place->answer == $place->answer3 || $place->answer2 == $place->answer3) {
+                    DB::rollback();
+                    return response()->json(['type' => 'answers', 'message' => 'The three answers should be different'], 401);
+                }
+			}
+			// Save places
+            $tour->places()->save($place);
+        }
+        DB::commit();
+        $tour->load(['creator', 'places']);
+        return response()->json($tour);
     }
 
     public function updatePlaces(Request $request, $id)
@@ -234,8 +273,8 @@ class TourController extends Controller
         $log = new Logger(__CLASS__ . __METHOD__);
         $log->debug('map_id:' . $id);
 
-        $map = Tour::find($id);
-        if ($map == null) {
+        $tour = Tour::find($id);
+        if ($tour == null) {
             return response()->json([
                 'type' => 'id',
                 'message' => 'The map no exist',
@@ -248,6 +287,10 @@ class TourController extends Controller
             '*.description' => 'required|string',
             '*.lat' => 'required|numeric',
             '*.lon' => 'required|numeric',
+            '*.question' => 'required|string|distinct',
+            '*.answer' => 'required|string',
+            '*.answer2' => 'required|string',
+            '*.answer3' => 'required|string',
             '*.order' => 'required|integer|min:0',
         ]);
 
@@ -259,14 +302,13 @@ class TourController extends Controller
                 ], 401);
             }
         }
-        dd($request->all());
 
-        $map->places()->update(['order' => null]);
+        $tour->places()->update(['order' => null]);
 
-        DB::transaction(function () use ($map, $request, $log) {
+        DB::transaction(function () use ($tour, $request, $log) {
             foreach ($request->json() as $row) {
                 $id = $row['id'];
-                $loc = $map->places()->find($id);
+                $loc = $tour->places()->find($id);
                 $loc->name = $row['name'];
                 $loc->description = $row['description'];
                 $loc->lat = $row['lat'];
@@ -275,7 +317,7 @@ class TourController extends Controller
                 $loc->save();
             }
         });
-        return response()->json($map->places);
+        return response()->json($tour->places);
     }
 
     public function updateArrayPlaces($places, $tour_id)
