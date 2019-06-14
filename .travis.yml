@@ -6,7 +6,7 @@ branches:
     - dev
 
 php:
-- 7.0
+- 7.1
 
 install:
 - sudo pip install codecov
