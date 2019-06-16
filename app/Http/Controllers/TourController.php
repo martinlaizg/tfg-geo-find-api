@@ -57,7 +57,7 @@ class TourController extends Controller
 
         $places = $request->input('places');
         // First update places
-		$response = $this->updateArrayPlaces($places, $tour);
+        $response = $this->updateArrayPlaces($places, $tour);
         if ($response != null) {
             return $response;
         }
@@ -210,7 +210,9 @@ class TourController extends Controller
             $place = new Place;
             $place->name = $entry['name'];
             $place->description = $entry['description'];
-            $place->image = $entry['image'];
+            if (isset($entry['image'])) {
+                $place->image = $entry['image'];
+            }
             $place->order = (int) $entry['order'];
             $place->lat = (double) $entry['lat'];
             $place->lon = (double) $entry['lon'];
@@ -281,7 +283,7 @@ class TourController extends Controller
                 if (!isset($place['answer']) || !isset($place['answer2']) || !isset($place['answer3'])) {
                     DB::rollback();
                     return response()->json(['type' => 'answers', 'message' => 'The three answers are required'], 401);
-				}
+                }
                 $newPlace->question = $place['question'];
                 $newPlace->answer = $place['answer'];
                 $newPlace->answer2 = $place['answer2'];
@@ -296,8 +298,8 @@ class TourController extends Controller
             }
         }
 
-		$tour->places()->where('order', '<', 0)->delete();
-		$tour->places()->where('order', '>', count($newPlaces) - 1)->delete();
+        $tour->places()->where('order', '<', 0)->delete();
+        $tour->places()->where('order', '>', count($newPlaces) - 1)->delete();
         DB::commit();
     }
 
