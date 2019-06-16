@@ -11,3 +11,5 @@ runLumen\.ps1
 \.directory
 
 coverage\.xml
+
+database/database\.sqlite
