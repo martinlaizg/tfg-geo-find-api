@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Location;
-use App\Map;
+use App\Tour;
 use Illuminate\Http\Request;
 use Monolog\Logger;
 
@@ -17,10 +17,10 @@ class SearchController extends Controller
         $query = $request->input('q');
         $log->debug('search item = ' . $query);
         if ($query != "") {
-            $tours = Map::where('name', 'like', '%' . $query . '%')->with('creator')->get();
+            $tours = Tour::where('name', 'like', '%' . $query . '%')->with('creator')->get();
             $places = Location::where('name', 'like', '%' . $query . '%')->get();
         } else {
-            $tours = Map::with('creator')->get();
+            $tours = Tour::with('creator')->get();
             $places = Location::get();
         }
         $merge = $tours->concat($places);
