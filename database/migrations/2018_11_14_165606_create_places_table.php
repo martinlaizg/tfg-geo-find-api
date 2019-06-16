@@ -22,13 +22,13 @@ class CreatePlacesTable extends Migration
             $table->string('answer')->nullable();
             $table->string('answer2')->nullable();
             $table->string('answer3')->nullable();
-            $table->integer('order')->nullable();
+            $table->integer('order');
             $table->double('lat', 12, 8);
             $table->double('lon', 12, 8);
             $table->string('image')->nullable();
             $table->timestamps();
 
-            // $table->unique(['tour_id', 'order']);
+            $table->unique(['tour_id', 'order']);
             $table->foreign('tour_id')->references('id')->on('tours')->onDelete('cascade');
 
         });

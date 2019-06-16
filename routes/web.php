@@ -26,7 +26,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->put('tours/{tour_id}', ['uses' => 'TourController@update']);
 
     $router->get('tours/{tour_id}/places', ['uses' => 'TourController@getPlaces']);
-    $router->put('tours/{tour_id}/places', ['uses' => 'TourController@updatePlaces']);
+    // $router->put('tours/{tour_id}/places', ['uses' => 'TourController@updatePlaces']);
 
     //
     // Play requests
