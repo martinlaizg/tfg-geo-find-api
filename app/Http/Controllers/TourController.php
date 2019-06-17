@@ -24,7 +24,7 @@ class TourController extends Controller
 
     public function update(Request $request, $id)
     {
-        $log = new Logger(__CLASS__ . __METHOD__);
+        $log = new Logger(__METHOD__);
 
         $tour = Tour::find($id);
         if ($tour == null) {
@@ -79,7 +79,7 @@ class TourController extends Controller
     public function getAll(Request $request)
     {
         try {
-            $log = new Logger(__CLASS__ . __METHOD__);
+            $log = new Logger(__METHOD__);
             $coords = $request->input('coords');
             $tours = Tour::query();
             if ($coords != '') {
@@ -144,7 +144,7 @@ class TourController extends Controller
 
     public function getSingleTour($id)
     {
-        $log = new Logger(__CLASS__ . __METHOD__);
+        $log = new Logger(__METHOD__);
         $log->debug('tour_id=' . $id);
 
         $tour = Tour::where('id', $id)->with(['creator', 'places'])->first();
@@ -159,7 +159,7 @@ class TourController extends Controller
 
     public function create(Request $request)
     {
-        $log = new Logger(__CLASS__ . __METHOD__);
+        $log = new Logger(__METHOD__);
         $log->debug($request);
         $validator = Validator::make($request->all(), [
             'name' => 'required',
@@ -186,6 +186,13 @@ class TourController extends Controller
             }
         }
 
+		// Creator always exist (see validator)
+		$creator = User::find($request->input('creator_id'));
+		if($creator->user_type == 'user' ){
+			$log->info('The creator has not permissions');
+			return response()->json(['type' => 'permissions', 'message' => 'The creator has not permissions'], 401);
+		}
+
         // Create the tour
         DB::beginTransaction();
         $tour = new Tour;
@@ -193,7 +200,6 @@ class TourController extends Controller
         $tour->description = $request->input('description');
         $tour->min_level = $request->input('min_level');
         $tour->image = $request->input('image');
-        $creator = User::find($request->input('creator_id'));
         $creator->createdTours()->save($tour);
 
         // Sort places to check the order
@@ -243,7 +249,7 @@ class TourController extends Controller
 
     private function updateArrayPlaces($newPlaces, $tour)
     {
-        $log = new Logger(__CLASS__ . __METHOD__);
+        $log = new Logger(__METHOD__);
         // Sort places to check the order
         usort($newPlaces, function ($a, $b) {
             return -($a['order'] <=> $b['order']);

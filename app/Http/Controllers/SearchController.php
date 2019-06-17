@@ -12,7 +12,7 @@ class SearchController extends Controller
 
     public function search(Request $request)
     {
-        $log = new Logger(__CLASS__);
+        $log = new Logger(__METHOD__);
 
         $query = $request->input('q');
         $log->debug('search item = ' . $query);
