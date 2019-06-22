@@ -7,6 +7,11 @@ class HomeController extends Controller
 
     public function home()
     {
+        return redirect()->to('api');
+    }
+
+    public function apiHome()
+    {
         return response()->json(['message' => 'Bienvenido a la API de GeoFind']);
     }
 

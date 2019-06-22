@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Social;
 use App\Ticket;
 use App\User;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Monolog\Logger;
@@ -117,13 +118,13 @@ class UserController extends Controller
         $log->debug('login with ' . $provider);
         // Google login
         if ($provider == 'google') {
-			try{
-				$client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-				$payload = $client->verifyIdToken($secure);
-			} catch(UnexpectedValueException $e){
+            try {
+                $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+                $payload = $client->verifyIdToken($secure);
+            } catch (UnexpectedValueException $e) {
                 $log->debug('Wrong provider token');
                 return response()->json(['type' => 'secure', 'message' => 'Invalid provider token'], 400);
-			}
+            }
             if ($payload) {
                 $sub = $payload['sub'];
                 $token_email = $payload['email'];
@@ -165,8 +166,8 @@ class UserController extends Controller
         } else if ($social->sub != $sub) {
             $log->debug('Wrong sub');
             return response()->json(['type' => 'token', 'message' => 'Invalid token'], 400);
-        }
-        return response()->json($user);
+		}
+        return response()->json(['token' => $this->jwt($user)]);
     }
 
     public function create(Request $request)
@@ -207,5 +208,19 @@ class UserController extends Controller
         $ticket->save();
 
         return response()->json();
+    }
+
+    protected function jwt(User $user)
+    {
+        $payload = [
+            'iss' => "lumen-jwt", // Issuer of the token
+            'sub' => $user->id, // Subject of the token
+            'iat' => time(), // Time when JWT was issued.
+            'exp' => time() + 60 * 60, // Expiration time 60s*60im
+        ];
+
+        // As you can see we are passing `JWT_SECRET` as the second parameter that will
+        // be used to decode the token in the future.
+        return JWT::encode($payload, env('JWT_SECRET'));
     }
 }
