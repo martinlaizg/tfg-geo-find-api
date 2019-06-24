@@ -17,7 +17,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
 
-        $router->get('users/{user_id}', ['uses' => 'UserController@get']);
+        
         $router->put('users/{user_id}', ['uses' => 'UserController@update']);
 
         $router->post('tours', ['uses' => 'TourController@create']);

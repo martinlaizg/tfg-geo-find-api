@@ -167,7 +167,7 @@ class UserController extends Controller
             $log->debug('Wrong sub');
             return response()->json(['type' => 'token', 'message' => 'Invalid token'], 400);
 		}
-        return response()->json(['token' => $this->jwt($user)]);
+        return response()->json(['token' => $this->jwt($user), 'user'=> $user]);
     }
 
     public function create(Request $request)
