@@ -138,15 +138,9 @@ class UserController extends Controller
         }
 
         $user = User::where('email', $email)->first();
-        if ($provider == 'own') {
-            if ($user->password != $secure) {
-                $log->debug('Wrong password');
-                return response()->json(['type' => 'password', 'message' => 'Invalid password'], 400);
-            }
-        }
-        if ($user == null) {
+        if($user == null){
             if ($provider == 'own') {
-                $log->debug('Invalid email');
+                $log->debug('Wrong email');
                 return response()->json(['type' => 'email', 'message' => 'Invalid email'], 400);
             }
             $user = new User;
@@ -155,6 +149,12 @@ class UserController extends Controller
             $user->image = $image;
             $user->user_type = 'user';
             $user->save();
+        }
+        if ($provider == 'own') {
+            if ($user->password != $secure) {
+                $log->debug('Wrong password');
+                return response()->json(['type' => 'password', 'message' => 'Invalid password'], 400);
+            }
         }
 
         $social = $user->socials()->where('provider', $provider)->first();
