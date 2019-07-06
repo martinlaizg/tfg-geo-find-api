@@ -51,7 +51,7 @@ class TourController extends Controller
         if ($validator->fails()) {
             if ($validator->fails()) {
                 $array = explode('.', $validator->errors()->keys()[0]);
-                return response()->json(['type' => end($array), 'message' => $validator->errors()->first()], 401);
+                return response()->json(['type' => end($array), 'message' => $validator->errors()->first()], 400);
             }
         }
 
@@ -182,7 +182,7 @@ class TourController extends Controller
         if ($validator->fails()) {
             if ($validator->fails()) {
                 $array = explode('.', $validator->errors()->keys()[0]);
-                return response()->json(['type' => end($array), 'message' => $validator->errors()->first()], 401);
+                return response()->json(['type' => end($array), 'message' => $validator->errors()->first()], 400);
             }
         }
 
@@ -190,7 +190,7 @@ class TourController extends Controller
 		$creator = User::find($request->input('creator_id'));
 		if($creator->user_type == 'user' ){
 			$log->info('The creator has not permissions');
-			return response()->json(['type' => 'permissions', 'message' => 'The creator has not permissions'], 401);
+			return response()->json(['type' => 'permissions', 'message' => 'The creator has not permissions'], 400);
 		}
 
         // Create the tour
@@ -209,7 +209,7 @@ class TourController extends Controller
         });
         $last = end($places);
         if ((count($places) - 1) != $last['order']) {
-            return response()->json(['type' => 'order', 'message' => 'Wrong place order'], 401);
+            return response()->json(['type' => 'order', 'message' => 'Wrong place order'], 400);
         }
         // Create places
         foreach ($places as $entry) {
@@ -228,7 +228,7 @@ class TourController extends Controller
                 // If question is setted, check answers
                 if (!isset($entry['answer']) || !isset($entry['answer2']) || !isset($entry['answer3'])) {
                     DB::rollback();
-                    return response()->json(['type' => 'answers', 'message' => 'The three answers are required'], 401);
+                    return response()->json(['type' => 'answers', 'message' => 'The three answers are required'], 400);
                 }
                 $place->answer = strval($entry['answer']);
                 $place->answer2 = strval($entry['answer2']);
@@ -236,7 +236,7 @@ class TourController extends Controller
                 // Check repeated answers
                 if ($place->answer == $place->answer2 || $place->answer == $place->answer3 || $place->answer2 == $place->answer3) {
                     DB::rollback();
-                    return response()->json(['type' => 'answers', 'message' => 'The three answers should be different'], 401);
+                    return response()->json(['type' => 'answers', 'message' => 'The three answers should be different'], 400);
                 }
             }
             // Save places
@@ -257,7 +257,7 @@ class TourController extends Controller
 
         $lastNewPlaces = reset($newPlaces)['order'];
         if ((count($newPlaces) - 1) != $lastNewPlaces) {
-            return response()->json(['type' => 'order', 'message' => 'Wrong place order'], 401);
+            return response()->json(['type' => 'order', 'message' => 'Wrong place order'], 400);
         }
 
         DB::beginTransaction();
@@ -272,7 +272,7 @@ class TourController extends Controller
                 $newPlace = $tour->places()->find($place['id']);
                 if ($newPlace == null) {
                     DB::rollback();
-                    return response()->json(['type' => 'exist', 'message' => 'Place ' . $place['id'] . ' do not exist'], 401);
+                    return response()->json(['type' => 'exist', 'message' => 'Place ' . $place['id'] . ' do not exist'], 400);
                 }
             }
 
@@ -288,7 +288,7 @@ class TourController extends Controller
             if (isset($place['question'])) {
                 if (!isset($place['answer']) || !isset($place['answer2']) || !isset($place['answer3'])) {
                     DB::rollback();
-                    return response()->json(['type' => 'answers', 'message' => 'The three answers are required'], 401);
+                    return response()->json(['type' => 'answers', 'message' => 'The three answers are required'], 400);
                 }
                 $newPlace->question = $place['question'];
                 $newPlace->answer = $place['answer'];
