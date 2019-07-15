@@ -202,7 +202,8 @@ class UserController extends Controller
         $title = $request->input('title');
         $message = $request->input('message');
 
-        $ticket = new Ticket();
+		$ticket = new Ticket();
+		$ticket->user_id = $request->auth->id;
         $ticket->title = $title;
         $ticket->message = $message;
         $ticket->save();

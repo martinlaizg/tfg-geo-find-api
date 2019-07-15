@@ -149,10 +149,7 @@ class TourController extends Controller
 
         $tour = Tour::where('id', $id)->with(['creator', 'places'])->first();
         if ($tour == null) {
-            return response()->json([
-                'type' => 'id',
-                'message' => 'The tour no exist',
-            ], 404);
+            return response()->json(['type' => 'id','message' => 'The tour no exist',], 404);
         }
         return response()->json($tour);
     }
