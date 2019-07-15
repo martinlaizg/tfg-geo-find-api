@@ -6,36 +6,35 @@
 |--------------------------------------------------------------------------
  */
 
+$router->get('', ['uses' => 'HomeController@home']);
+
 $router->group(['prefix' => 'api'], function () use ($router) {
-    $router->get('', ['uses' => 'HomeController@home']);
+    $router->get('', ['uses' => 'HomeController@apiHome']);
 
     $router->post('login', ['uses' => 'UserController@login']);
-
-    //
-    // User requests
     $router->post('users', ['uses' => 'UserController@create']);
-    $router->get('users/{user_id}', ['uses' => 'UserController@get']);
-    $router->put('users/{user_id}', ['uses' => 'UserController@update']);
-
-    //
-    // Tour requests
     $router->get('tours', ['uses' => 'TourController@getAll']);
-    $router->post('tours', ['uses' => 'TourController@create']);
 
-    $router->get('tours/{tour_id}', ['uses' => 'TourController@getSingleTour']);
-    $router->put('tours/{tour_id}', ['uses' => 'TourController@update']);
+    // Only for logged users
+    $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
 
-    $router->get('tours/{tour_id}/places', ['uses' => 'TourController@getPlaces']);
-    // $router->put('tours/{tour_id}/places', ['uses' => 'TourController@updatePlaces']);
+        $router->put('users/{user_id}', ['uses' => 'UserController@update']);
 
-    //
-    // Play requests
-    $router->get('plays', ['uses' => 'PlayController@getPlay']);
-    $router->post('plays', ['uses' => 'PlayController@createPlay']);
-    $router->post('plays/{play_id}/places', ['uses' => 'PlayController@completePlace']);
+        $router->post('tours', ['uses' => 'TourController@create']);
 
-    //
-    // Send message
-    $router->post('support', ['uses' => 'UserController@postMessage']);
+        $router->get('tours/{tour_id}', ['uses' => 'TourController@getSingleTour']);
+        $router->put('tours/{tour_id}', ['uses' => 'TourController@update']);
+
+        $router->get('tours/{tour_id}/places', ['uses' => 'TourController@getPlaces']);
+
+        $router->get('tours/{tour_id}/users/{user_id}/play', ['uses' => 'PlayController@getPlay']);
+        $router->post('tours/{tour_id}/users/{user_id}/play', ['uses' => 'PlayController@createPlay']);
+
+        $router->get('plays/{play_id}', ['uses' => 'PlayController@getPlayById']);
+        $router->post('plays/{play_id}/places/{place_id}', ['uses' => 'PlayController@completePlace']);
+
+        $router->post('support', ['uses' => 'UserController@postMessage']);
+
+    });
 
 });
