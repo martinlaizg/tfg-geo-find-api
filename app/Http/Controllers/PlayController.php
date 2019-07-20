@@ -84,7 +84,7 @@ class PlayController extends Controller
         if ($play->tour->id == $place->tour->id) {
             $completedPlaces = count($play->places);
             if ($completedPlaces != $place->order) {
-                return response()->json(['type' => 'place', 'message' => 'You can not complete that place already'], 400);
+                return response()->json(['type' => 'place', 'message' => 'You can not complete that place yet'], 400);
             }
             $play->places()->attach($place->id);
         } else {

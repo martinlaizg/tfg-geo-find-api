@@ -6,23 +6,30 @@ use Closure;
 use Exception;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
+use Monolog\Logger;
 
 class JwtMiddleware
 {
     public function handle($request, Closure $next, $guard = null)
     {
+        $log = new Logger(__METHOD__);
         $token = $request->bearerToken();
 
         if (!$token) {
+            $log->debug('No token');
             // Unauthorized response if token not there
             return response()->json(['type' => 'auth', 'message' => 'Token not provided'], 401);
         }
         try {
+            $log->debug('Decode token='.$token);
+            $log->debug('Token secret='.env('JWT_SECRET'));
             // Decode the recived token
             $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
         } catch (ExpiredException $e) {
+            $log->debug('Expired token');
             return response()->json(['type' => 'expired', 'message' => 'Provided token is expired'], 401);
         } catch (Exception $e) {
+            $log->debug('Invalid token ');
             return response()->json(['type' => 'token', 'message' => 'Invalid token'], 400);
         }
 
