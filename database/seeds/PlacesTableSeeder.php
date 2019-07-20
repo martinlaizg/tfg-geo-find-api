@@ -21,6 +21,7 @@ class PlacesTableSeeder extends Seeder
         $place->order = 0;
         $place->lat = 38.385500;
         $place->lon = -0.511155;
+        $place->image = "https://veu.ua.es/es/imagenes/noticias/2019/2/mano-ua.jpg";
         $tour->places()->save($place);
 
         $place = new Place;
@@ -29,6 +30,7 @@ class PlacesTableSeeder extends Seeder
         $place->order = 1;
         $place->lat = 38.386237;
         $place->lon = -0.511448;
+        $place->image = "https://revista.eps.ua.es/index.php/galeria-de-fotos/1-xcbv/detail/37-2009-11-20_fotospoli_05?tmpl=component&phocadownload=2";
         $tour->places()->save($place);
 
         $place = new Place;
@@ -37,6 +39,7 @@ class PlacesTableSeeder extends Seeder
         $place->order = 2;
         $place->lat = 38.383650;
         $place->lon = -0.512115;
+        $place->image = "https://blogs.ua.es/bibliotecauniversitaria/files/2017/06/bibioteca-general.jpg";
         $tour->places()->save($place);
 
         $place = new Place;
@@ -45,6 +48,7 @@ class PlacesTableSeeder extends Seeder
         $place->order = 3;
         $place->lat = 38.384571;
         $place->lon = -0.514871;
+        $place->image = "https://veu.ua.es/es/imagenes/noticias/2016/11/mirohorizontal.jpg";
         $tour->places()->save($place);
 
     }
