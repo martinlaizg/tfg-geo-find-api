@@ -19,7 +19,7 @@ class CreateToursTable extends Migration
             $table->text('description');
             $table->string('image')->nullable();
             $table->unsignedBigInteger('creator_id');
-            $table->enum('min_level', ['therm', 'compass', 'map']);
+            $table->enum('min_level', ['therm', 'compass', 'map'])->default('map');
             $table->timestamps();
 
             $table->foreign('creator_id')->references('id')->on('users')->onDelete('cascade');

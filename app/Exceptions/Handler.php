@@ -3,9 +3,9 @@
 namespace App\Exceptions;
 
 use Exception;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -45,6 +45,14 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        return parent::render($request, $exception);
+        switch ($exception->getStatusCode()) {
+            // not found
+            case 404:
+                return response()->json(['type' => 'http', 'message' => 'Resource not found'], 404);
+                break;
+            default:
+                return parent::render($request, $exception);
+                break;
+        }
     }
 }

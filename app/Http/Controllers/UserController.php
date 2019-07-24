@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Social;
 use App\Ticket;
 use App\User;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Monolog\Logger;
@@ -17,10 +18,11 @@ class UserController extends Controller
     public function update($user_id, Request $request)
     {
         $log = new Logger(__METHOD__);
-        $log->info('user=' . $user_id);
+        $log->debug('user_id=' . $user_id);
 
         $user = User::find($user_id);
         if ($user == null) {
+            $log->info('The user do not exist');
             return response()->json(['type' => 'exist', 'message' => 'The user do not exist'], 404);
         }
 
@@ -33,47 +35,61 @@ class UserController extends Controller
             'user.secure' => 'string',
         ]);
         if ($validator->fails()) {
-            return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
+            $array = explode('.', $validator->errors()->keys()[0]);
+            return response()->json(['type' => end($array), 'message' => $validator->errors()->first()], 400);
         }
 
         $provider = $request->input('provider');
         $secure = $request->input('secure');
 
         if ($provider == 'own') {
+            // The secure is the password
             if ($user->password != $secure) {
-                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
+                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 400);
             }
         } else {
-            $payload = null;
-            if ($provider == 'google') {
-                $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-                $payload = $client->verifyIdToken($secure);
+            // The secure is the sub of the provider
+            $social = Social::where('sub', $secure)->where('provider', $provider)->first();
+            if ($social == null) {
+                $log->info('Invalid sub');
+                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 400);
             }
-            // add more providers here
-
-            if ($payload == null) {
-                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
-            }
-
-            $sub = $payload['sub'];
-
-            if ($sub == null) {
-                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
-            }
-            $token_user = Social::where('sub', $sub)->where('provider', $provider)->first()->user;
+            $token_user = $social->user;
             if ($token_user->id != $user->id) {
-                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 401);
+                $log->info('Required user no match the sub');
+                return response()->json(['type' => 'secure', 'message' => 'Wrong secure'], 400);
             }
         }
         $user->name = $request->input('user.name');
-        $user->email = $request->input('user.email');
-		$user->username = $request->input('user.username');
-		$password = $request->input('user.secure');
-		if($password!=null){
-			$user->password = $password;
-		}
-        $user->save();
 
+        // Validate duplicated email if changes
+        $newEmail = $request->input('user.email');
+        if ($newEmail != $user->email) {
+            if (User::where('email', $newEmail)->first() != null) {
+                $log->info('Email already in use');
+                return response()->json(['type' => 'email', 'message' => 'Email already in use'], 400);
+            }
+            $user->email = $newEmail;
+        }
+
+        // Validate duplicated username if changes
+        $newUsername = $request->input('user.username');
+        if ($newUsername != null && $newUsername != $user->username) {
+            if (User::where('username', $newUsername)->first() != null) {
+                $log->info('Username already in use');
+                return response()->json(['type' => 'username', 'message' => 'Username already in use'], 400);
+            }
+            $user->username = $newUsername;
+            if ($user->user_type == 'user') {
+                $user->user_type = 'creator';
+            }
+        }
+
+        $password = $request->input('user.secure');
+        if ($password != null) {
+            $user->password = $password;
+        }
+        $user->save();
         return response()->json($user, 200);
     }
 
@@ -87,13 +103,13 @@ class UserController extends Controller
             'secure' => 'required|string',
         ]);
         if ($validator->fails()) {
-            return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
+            $array = explode('.', $validator->errors()->keys()[0]);
+            return response()->json(['type' => end($array), 'message' => $validator->errors()->first()], 400);
         }
 
         $email = $request->input('email');
         $provider = $request->input('provider');
         $secure = $request->input('secure');
-        //$log->debug('secure=' . $secure);
 
         $sub = '';
         $name = null;
@@ -102,8 +118,13 @@ class UserController extends Controller
         $log->debug('login with ' . $provider);
         // Google login
         if ($provider == 'google') {
-            $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-            $payload = $client->verifyIdToken($secure);
+            try {
+                $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+                $payload = $client->verifyIdToken($secure);
+            } catch (UnexpectedValueException $e) {
+                $log->debug('Wrong provider token');
+                return response()->json(['type' => 'secure', 'message' => 'Invalid provider token'], 400);
+            }
             if ($payload) {
                 $sub = $payload['sub'];
                 $token_email = $payload['email'];
@@ -119,14 +140,21 @@ class UserController extends Controller
         $user = User::where('email', $email)->first();
         if ($user == null) {
             if ($provider == 'own') {
-                $log->debug('Wrong login');
-                return response()->json(['type' => 'secure', 'message' => 'Invalid token'], 400);
+                $log->debug('Wrong email');
+                return response()->json(['type' => 'email', 'message' => 'Invalid email'], 400);
             }
             $user = new User;
             $user->email = $email;
             $user->name = $name;
             $user->image = $image;
+            $user->user_type = 'user';
             $user->save();
+        }
+        if ($provider == 'own') {
+            if ($user->password != $secure) {
+                $log->debug('Wrong password');
+                return response()->json(['type' => 'password', 'message' => 'Invalid password'], 400);
+            }
         }
 
         $social = $user->socials()->where('provider', $provider)->first();
@@ -135,26 +163,16 @@ class UserController extends Controller
             $social->sub = $sub;
             $social->provider = $provider;
             $user->socials()->save($social);
-		}else if($social->sub != $sub ){
-			$log->debug('Wrong sub');
-			return response()->json(['type' => 'token', 'message' => 'Invalid token'], 400);
-		}
-		
-        return response()->json($user);
-    }
-
-    public function get($id)
-    {
-        $user = User::find($id);
-        if ($user == null) {
-            return response()->json(['type' => 'id', 'message' => 'El id no existe'], 404);
+        } else if ($social->sub != $sub) {
+            $log->debug('Wrong sub');
+            return response()->json(['type' => 'token', 'message' => 'Invalid token'], 400);
         }
-        return response()->json($user, 200);
+        return response($user)->header('Authorization', $this->jwt($user));
     }
 
     public function create(Request $request)
     {
-        $log = new Logger('UserController - createUser');
+        $log = new Logger(__METHOD__);
         $log->debug($request);
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users',
@@ -162,7 +180,8 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['type' => $validator->errors()->keys()[0], 'message' => $validator->errors()->first()], 401);
+            $array = explode('.', $validator->errors()->keys()[0]);
+            return response()->json(['type' => end($array), 'message' => $validator->errors()->first()], 400);
         }
 
         $u = new User;
@@ -183,11 +202,26 @@ class UserController extends Controller
         $title = $request->input('title');
         $message = $request->input('message');
 
-        $ticket = new Ticket();
+		$ticket = new Ticket();
+		$ticket->user_id = $request->auth->id;
         $ticket->title = $title;
         $ticket->message = $message;
         $ticket->save();
 
         return response()->json();
+    }
+
+    protected function jwt(User $user)
+    {
+        $payload = [
+            'iss' => "lumen-jwt", // Issuer of the token
+            'sub' => $user->id, // Subject of the token
+            'iat' => time(), // Time when JWT was issued.
+            'exp' => time() + (60 * 60 * 24 * 7), // Expiration date 60s * 60min * 24h * 7d
+        ];
+
+        // As you can see we are passing `JWT_SECRET` as the second parameter that will
+        // be used to decode the token in the future.
+        return JWT::encode($payload, env('JWT_SECRET'));
     }
 }

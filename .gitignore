@@ -3,7 +3,7 @@
 Homestead.json
 Homestead.yaml
 .env
-runLumen.sh
-
-
-runLumen\.ps1
+runLumen.*
+\.directory
+coverage\.xml
+database/database\.sqlite
