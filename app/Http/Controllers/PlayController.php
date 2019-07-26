@@ -45,11 +45,9 @@ class PlayController extends Controller
 
     }
 
-    public function createPlay(Request $request)
+    public function createPlay(Request $request, $tour_id, $user_id)
     {
         $log = new Logger(__METHOD__);
-        $tour_id = $request->input('tour_id');
-        $user_id = $request->input('user_id');
 
         $log->debug('tour_id=' . $tour_id . 'user_id=' . $user_id);
 
