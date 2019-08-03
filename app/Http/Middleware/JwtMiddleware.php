@@ -30,7 +30,7 @@ class JwtMiddleware
             return response()->json(['type' => 'expired', 'message' => 'Provided token is expired'], 401);
         } catch (Exception $e) {
             $log->debug('Invalid token ');
-            return response()->json(['type' => 'token', 'message' => 'Invalid token'], 400);
+            return response()->json(['type' => 'token', 'message' => 'Invalid token'], 401);
         }
 
         $user = User::find($credentials->sub);
