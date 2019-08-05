@@ -9,6 +9,7 @@ use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Monolog\Logger;
+use UnexpectedValueException;
 use Validator;
 use \Google_Client;
 
@@ -202,8 +203,8 @@ class UserController extends Controller
         $title = $request->input('title');
         $message = $request->input('message');
 
-		$ticket = new Ticket();
-		$ticket->user_id = $request->auth->id;
+        $ticket = new Ticket();
+        $ticket->user_id = $request->auth->id;
         $ticket->title = $title;
         $ticket->message = $message;
         $ticket->save();
