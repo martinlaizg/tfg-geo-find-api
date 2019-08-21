@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Social;
 use App\Ticket;
 use App\User;
+use App\Play;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -224,5 +225,13 @@ class UserController extends Controller
         // As you can see we are passing `JWT_SECRET` as the second parameter that will
         // be used to decode the token in the future.
         return JWT::encode($payload, env('JWT_SECRET'));
+    }
+
+    public function getUserPlays(Request $request, $user_id ){
+        if($request->auth->id != $user_id){
+            return response()->json(['type' => 'authorization', 'message' => 'You are not allowed'], 400);
+        }
+        $plays = Play::where('user_id',$user_id)->with(['tour', 'tour.places', 'tour.creator', 'places'])->get();
+        return response()->json($plays, 200);
     }
 }
