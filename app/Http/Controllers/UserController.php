@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Play;
 use App\Social;
 use App\Ticket;
 use App\User;
-use App\Play;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -98,10 +98,9 @@ class UserController extends Controller
     public function login(Request $request)
     {
         $log = new Logger(__METHOD__);
-
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'provider' => ['required', Rule::in(['own', 'google'])],
+            'provider' => ['required', Rule::in(['own', 'google', 'OWN', 'GOOGLE'])],
             'secure' => 'required|string',
         ]);
         if ($validator->fails()) {
@@ -111,16 +110,33 @@ class UserController extends Controller
 
         $email = $request->input('email');
         $provider = $request->input('provider');
+        $provider = strtolower($provider);
         $secure = $request->input('secure');
-
         $sub = '';
         $name = null;
         $image = null;
 
         $log->debug('login with ' . $provider);
+        if ($provider == 'own') {
+            $user = User::where('email', $email)->first();
+            if ($user == null) {
+                // The user do not exists
+                $log->debug('Wrong email');
+                return response()->json(['type' => 'email', 'message' => 'Invalid email'], 400);
+            }
+            // The user exists
+            if ($user->password != $secure) {
+                // No match the passwords
+                $log->debug('Wrong password');
+                return response()->json(['type' => 'password', 'message' => 'Invalid password'], 400);
+            }
+            return response($user)->header('Authorization', $this->jwt($user));
+        }
+
         // Google login
         if ($provider == 'google') {
             try {
+                // the token is the secure
                 $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
                 $payload = $client->verifyIdToken($secure);
             } catch (UnexpectedValueException $e) {
@@ -132,8 +148,11 @@ class UserController extends Controller
                 $token_email = $payload['email'];
                 $name = $payload['name'];
                 $image = $payload['picture'];
-            }
-            if (!$payload || $email != $token_email) {
+                if ($token_email != $email) {
+                    $log->debug('Wrong login');
+                    return response()->json(['type' => 'secure', 'message' => 'Invalid token'], 400);
+                }
+            } else {
                 $log->debug('Wrong login');
                 return response()->json(['type' => 'secure', 'message' => 'Invalid token'], 400);
             }
@@ -151,12 +170,14 @@ class UserController extends Controller
             $user->image = $image;
             $user->user_type = 'user';
             $user->save();
-        }
-        if ($provider == 'own') {
-            if ($user->password != $secure) {
-                $log->debug('Wrong password');
-                return response()->json(['type' => 'password', 'message' => 'Invalid password'], 400);
+        } else {
+            if ($user->name == null) {
+                $user->name = $name;
             }
+            if ($user->image == null) {
+                $user->image = $image;
+            }
+            $user->save();
         }
 
         $social = $user->socials()->where('provider', $provider)->first();
@@ -227,11 +248,12 @@ class UserController extends Controller
         return JWT::encode($payload, env('JWT_SECRET'));
     }
 
-    public function getUserPlays(Request $request, $user_id ){
-        if($request->auth->id != $user_id){
+    public function getUserPlays(Request $request, $user_id)
+    {
+        if ($request->auth->id != $user_id) {
             return response()->json(['type' => 'authorization', 'message' => 'You are not allowed'], 400);
         }
-        $plays = Play::where('user_id',$user_id)->with(['tour', 'tour.places', 'tour.creator', 'places'])->get();
+        $plays = Play::where('user_id', $user_id)->with(['tour', 'tour.places', 'tour.creator', 'places'])->get();
         return response()->json($plays, 200);
     }
 }

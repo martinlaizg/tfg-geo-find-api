@@ -22,6 +22,10 @@ class PlacesTableSeeder extends Seeder
         $place->lat = 38.385500;
         $place->lon = -0.511155;
         $place->image = "https://veu.ua.es/es/imagenes/noticias/2019/2/mano-ua.jpg";
+        $place->question = "Pregunta1?";
+        $place->answer = "Respuesta";
+        $place->answer2 = "Respuesta2";
+        $place->answer3 = "Respuesta3";
         $tour->places()->save($place);
         $place = new Place;
         $place->name = "Reloj de sol";
@@ -30,6 +34,10 @@ class PlacesTableSeeder extends Seeder
         $place->lat = 38.386237;
         $place->lon = -0.511448;
         $place->image = "https://revista.eps.ua.es/index.php/galeria-de-fotos/1-xcbv/detail/37-2009-11-20_fotospoli_05?tmpl=component&phocadownload=2";
+        $place->question = "Pregunta2?";
+        $place->answer = "Respuesta";
+        $place->answer2 = "Respuesta2";
+        $place->answer3 = "Respuesta3";
         $tour->places()->save($place);
         $place = new Place;
         $place->name = "Biblioteca universitaria";
@@ -38,6 +46,10 @@ class PlacesTableSeeder extends Seeder
         $place->lat = 38.383650;
         $place->lon = -0.512115;
         $place->image = "https://blogs.ua.es/bibliotecauniversitaria/files/2017/06/bibioteca-general.jpg";
+        $place->question = "Pregunta3?";
+        $place->answer = "Respuesta";
+        $place->answer2 = "Respuesta2";
+        $place->answer3 = "Respuesta3";
         $tour->places()->save($place);
         $place = new Place;
         $place->name = "Obra de Arte, Escultura de Antoni Miró";
@@ -46,6 +58,10 @@ class PlacesTableSeeder extends Seeder
         $place->lat = 38.384571;
         $place->lon = -0.514871;
         $place->image = "https://veu.ua.es/es/imagenes/noticias/2016/11/mirohorizontal.jpg";
+        $place->question = "Pregunta4?";
+        $place->answer = "Respuesta";
+        $place->answer2 = "Respuesta2";
+        $place->answer3 = "Respuesta3";
         $tour->places()->save($place);
 
         // Valencia
@@ -56,7 +72,7 @@ class PlacesTableSeeder extends Seeder
         $place->order = 0;
         $place->lat = 39.454853;
         $place->lon = -0.350458;
-        $place->image = "https://lh5.googleusercontent.com/p/AF1QipOfmVkd1fl-BcQUwfVOlzkciQO9YIjJ5GDgEMU6=w408-h306-k-no";
+        $place->image = "https://valenciaandgo.com/wp-content/uploads/2019/01/valencia-cac-1049389-4920x2460.jpg";
         $tour->places()->save($place);
 
     }

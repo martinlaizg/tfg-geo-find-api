@@ -55,7 +55,7 @@ class Handler extends ExceptionHandler
                     return parent::render($request, $exception);
                     break;
             }
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return parent::render($request, $exception);
         }
     }
