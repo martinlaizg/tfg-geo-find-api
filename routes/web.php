@@ -19,6 +19,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
 
         $router->put('users/{user_id}', ['uses' => 'UserController@update']);
+        $router->get('users/{user_id}/plays', ['uses' => 'UserController@getUserPlays']);
 
         $router->post('tours', ['uses' => 'TourController@create']);
 

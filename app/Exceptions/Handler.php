@@ -45,14 +45,18 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        switch ($exception->getStatusCode()) {
-            // not found
-            case 404:
-                return response()->json(['type' => 'http', 'message' => 'Resource not found'], 404);
-                break;
-            default:
-                return parent::render($request, $exception);
-                break;
+        try {
+            switch ($exception->getStatusCode()) {
+                // not found
+                case 404:
+                    return response()->json(['type' => 'http', 'message' => 'Resource not found'], 404);
+                    break;
+                default:
+                    return parent::render($request, $exception);
+                    break;
+            }
+        } catch (\Throwable $e) {
+            return parent::render($request, $exception);
         }
     }
 }

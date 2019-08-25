@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Play extends Model
 {
     protected $hidden = [
-        'tour_id', 'user_id', 'pivot',
+        'pivot',
     ];
 
     protected $fillable = [

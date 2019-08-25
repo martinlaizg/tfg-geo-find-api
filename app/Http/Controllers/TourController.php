@@ -123,15 +123,9 @@ class TourController extends Controller
                     ->where('name', 'like', '%' . $search)
                     ->orWhere('name', 'like', $search . '%')
                     ->orWhere('name', 'like', '%' . $search . '%')
-                    ->orWhere('country', 'like', $search . '%')
-                    ->orWhere('country', 'like', '%' . $search)
-                    ->orWhere('country', 'like', '%' . $search . '%')
-                    ->orWhere('state', 'like', $search . '%')
-                    ->orWhere('state', 'like', '%' . $search)
-                    ->orWhere('state', 'like', '%' . $search . '%')
-                    ->orWhere('city', 'like', $search . '%')
-                    ->orWhere('city', 'like', '%' . $search)
-                    ->orWhere('city', 'like', '%' . $search . '%');
+                    ->orWhere('description', 'like', $search . '%')
+                    ->orWhere('description', 'like', '%' . $search)
+                    ->orWhere('description', 'like', '%' . $search . '%');
             }
             return response()->json($tours->with(['creator', 'places' => function ($query) {
                 $query->orderBy('order');
